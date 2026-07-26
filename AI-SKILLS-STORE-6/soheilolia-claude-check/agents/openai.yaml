@@ -1,0 +1,6 @@
+interface:
+  display_name: "Claude Check"
+  short_description: "Verify PRs, receipts, tests, CI, and shipping truth"
+  default_prompt: "Use $claude-check to create a strict review prompt for this PR or receipt."
+policy:
+  allow_implicit_invocation: true

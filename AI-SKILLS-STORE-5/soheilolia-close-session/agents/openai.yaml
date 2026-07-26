@@ -1,0 +1,6 @@
+interface:
+  display_name: "Close Session"
+  short_description: "Close sessions with git and room checks."
+  default_prompt: "Close session"
+policy:
+  allow_implicit_invocation: true

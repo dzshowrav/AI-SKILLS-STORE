@@ -1,0 +1,57 @@
+# MCP Maker
+
+Build MCP (Model Context Protocol) servers from scratch for any API, service, or tool.
+
+## When to activate
+
+Trigger on: "make me an MCP", "build an MCP", "MCP for [service]", "connect AI to [service]"
+
+## Flow
+
+1. **Ask:** "What MCP would you like to make? Give me a service name, API docs URL, or npm package."
+2. **Research:** Find SDK, map capabilities, identify auth requirements. Don't over-ask.
+3. **Report back:** Present plan with tools list, auth needs, and what you need from the user.
+4. **Build:** After user says "go", create the full MCP server:
+
+```
+~/[service]-mcp/
+├── package.json          ← @modelcontextprotocol/sdk + zod + service SDK
+├── src/index.js          ← MCP server with tools
+├── .env                  ← Credentials (gitignored)
+├── .gitignore
+└── README.md             ← Setup + Claude/Goose/Cursor config
+```
+
+## MCP Server Pattern (index.js)
+
+```javascript
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { z } from "zod";
+
+const server = new McpServer({ name: "[service]", version: "1.0.0" });
+
+server.tool(
+  "tool_name",
+  "Clear description — AI reads this to decide WHEN to use it",
+  { param: z.string().describe("What this param is") },
+  async ({ param }) => {
+    try {
+      const result = await client.doThing(param);
+      return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+    } catch (error) {
+      return { content: [{ type: "text", text: `❌ ${error.message}` }], isError: true };
+    }
+  }
+);
+
+await server.connect(new StdioServerTransport());
+```
+
+## Key rules
+- Snake_case tool names
+- Zod `.describe()` on every param
+- Try/catch every handler, return `isError: true` on failure
+- Descriptions are everything — write them for a smart coworker
+- Always test with real credentials before declaring done
+- Include Claude Desktop JSON config + Goose YAML config + Cursor MCP config in README
