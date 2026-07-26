@@ -1,0 +1,19 @@
+{
+  "name": "code-formatter",
+  "description": "Automatically formats source code on save using project-specific formatters",
+  "version": "1.2.0",
+  "author": "Dev Team",
+  "dependencies": {
+    "base-plugin": ">=1.0.0"
+  },
+  "min_cli_version": "1.0.0",
+  "skills": [
+    "formatting-conventions"
+  ],
+  "rules": [
+    "formatting.md"
+  ],
+  "mcp_servers": [
+    "formatter-server"
+  ]
+}

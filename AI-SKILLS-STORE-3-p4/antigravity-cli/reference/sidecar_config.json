@@ -1,0 +1,45 @@
+{
+  "sidecars": [
+    {
+      "command": "node",
+      "args": ["watcher.js"],
+      "restart_policy": "always",
+      "description": "File system watcher that triggers rebuilds on changes",
+      "env": {
+        "WATCH_DIR": "/workspace/src",
+        "BUILD_CMD": "npm run build"
+      },
+      "working_dir": "/workspace"
+    },
+    {
+      "command": "python3",
+      "args": ["-m", "http.server", "8080"],
+      "restart_policy": "on_failure",
+      "description": "Development HTTP server",
+      "env": {},
+      "working_dir": "/workspace/dist"
+    },
+    {
+      "builtin": "schedule",
+      "args": [
+        "30 9 * * 1-5",
+        "agentapi",
+        "new-conversation",
+        "check my morning standup notes"
+      ],
+      "restart_policy": "always",
+      "description": "Daily standup reminder (weekdays at 9:30 AM)"
+    },
+    {
+      "builtin": "schedule",
+      "args": [
+        "0 2 * * *",
+        "agentapi",
+        "send-message",
+        "run nightly maintenance tasks"
+      ],
+      "restart_policy": "always",
+      "description": "Nightly maintenance at 2 AM"
+    }
+  ]
+}

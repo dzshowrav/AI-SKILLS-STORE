@@ -1,0 +1,45 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/workspace"
+      ],
+      "env": {},
+      "disabled": false,
+      "autoApprove": [
+        "read_file",
+        "search_code",
+        "glob"
+      ]
+    },
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "disabled": false,
+      "autoApprove": []
+    },
+    "database": {
+      "command": "python3",
+      "args": [
+        "-m",
+        "mcp_server_postgres"
+      ],
+      "env": {
+        "DATABASE_URL": "postgresql://localhost/mydb"
+      },
+      "disabled": true,
+      "autoApprove": [
+        "query"
+      ]
+    }
+  }
+}

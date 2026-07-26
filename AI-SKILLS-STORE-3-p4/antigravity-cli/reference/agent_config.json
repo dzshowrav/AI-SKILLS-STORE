@@ -1,0 +1,15 @@
+{
+  "name": "go-developer",
+  "description": "Specialized Go development agent with database expertise",
+  "system_prompt": "You are a Go development expert. Follow idiomatic Go patterns, use clean architecture, and write production-ready code.",
+  "tool_groups": ["read", "write", "run", "search"],
+  "allowed_tools": ["read_file", "write_file", "edit_file", "run_command", "search_code", "glob", "grep", "web_search", "web_fetch"],
+  "disallowed_tools": ["browser_navigate", "browser_click", "browser_javascript"],
+  "model": "gemini-2.5-flash",
+  "mode": "accept-edits",
+  "temperature": 0.2,
+  "max_tokens": 65536,
+  "agent_type": 2,
+  "is_agentic": true,
+  "version": "1.0.0"
+}

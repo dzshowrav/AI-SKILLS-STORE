@@ -1,0 +1,28 @@
+{
+  "skills": [
+    {
+      "name": "go-best-practices",
+      "description": "Go development conventions and patterns",
+      "path": "/shared/skills/go-best-practices",
+      "version": "2.0.0"
+    },
+    {
+      "name": "clean-architecture",
+      "description": "Clean Architecture patterns in Go",
+      "path": "./skills/clean-architecture",
+      "version": "1.1.0"
+    },
+    {
+      "name": "react-component-design",
+      "description": "React component architecture patterns",
+      "path": "/shared/skills/react-patterns",
+      "version": "3.0.0"
+    },
+    {
+      "name": "database-schema",
+      "description": "Database schema design patterns",
+      "path": "/shared/skills/schema-design",
+      "version": "1.0.0"
+    }
+  ]
+}

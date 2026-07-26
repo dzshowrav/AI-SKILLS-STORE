@@ -1,0 +1,29 @@
+{
+  "plugins": [
+    {
+      "name": "code-formatter",
+      "enabled": true,
+      "config": {
+        "formatter": "gofumpt",
+        "on_save": true,
+        "target_extensions": [".go", ".ts", ".js"]
+      }
+    },
+    {
+      "name": "notifications",
+      "enabled": true,
+      "config": {
+        "provider": "slack",
+        "webhook_url": "${SLACK_WEBHOOK_URL}"
+      }
+    },
+    {
+      "name": "metrics-collector",
+      "enabled": false,
+      "config": {
+        "interval_seconds": 60,
+        "output_dir": "./metrics"
+      }
+    }
+  ]
+}

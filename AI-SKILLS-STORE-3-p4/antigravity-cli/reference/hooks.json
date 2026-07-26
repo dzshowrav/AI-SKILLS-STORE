@@ -1,0 +1,28 @@
+{
+  "hooks": [
+    {
+      "event": "on_activate",
+      "command": "mkdir -p plugins/code-formatter/data && echo 'active' > plugins/code-formatter/data/status"
+    },
+    {
+      "event": "on_deactivate",
+      "command": "rm -f plugins/code-formatter/data/status"
+    },
+    {
+      "event": "before_conversation",
+      "command": "python3 plugins/code-formatter/prepare_context.py"
+    },
+    {
+      "event": "after_conversation",
+      "command": "python3 plugins/code-formatter/summarize.py --output plugins/code-formatter/data/last_summary.json"
+    },
+    {
+      "event": "before_tool_call",
+      "command": "python3 plugins/code-formatter/validate_tool.py --tool-name \"${TOOL_NAME}\""
+    },
+    {
+      "event": "after_tool_call",
+      "command": "python3 plugins/code-formatter/log_tool.py --tool-name \"${TOOL_NAME}\" --duration \"${DURATION_MS}\" --status \"${STATUS}\""
+    }
+  ]
+}

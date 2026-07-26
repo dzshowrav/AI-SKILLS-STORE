@@ -1,0 +1,223 @@
+import type { Project } from "@repo/store";
+import type { StateCreator } from "zustand";
+
+import { projectApi } from "@/lib/api/projectApi";
+import { suppressNextSyncToast } from "@/lib/api/sync-toast";
+
+import type { BoardSliceState, ProjectSliceState, UserSliceState } from "./types";
+
+export const createProjectSlice: StateCreator<
+  ProjectSliceState & Pick<UserSliceState, "userId"> & Pick<BoardSliceState, "currentBoardId">,
+  [],
+  [],
+  ProjectSliceState
+> = (set, get) => ({
+  projects: [],
+  isLoadingProjects: false,
+
+  setProjects: (projects: Project[]) => {
+    // ponytail: setProjects is only the DnD optimistic writer (poll uses set() directly),
+    // so a local reorder/move lands here — suppress the "synced" toast for our own change.
+    suppressNextSyncToast();
+    set({ projects });
+  },
+
+  fetchProjects: async (boardId: string) => {
+    if (!boardId) {
+      return;
+    }
+
+    // Only show the skeleton on first load. Background polls (every 5s) must not toggle
+    // isLoadingProjects, or the board unmounts to a Skeleton and remounts each poll — the flicker.
+    const isInitialLoad = get().projects.length === 0;
+    if (isInitialLoad) {
+      set({ isLoadingProjects: true });
+    }
+
+    try {
+      const projects = await projectApi.getProjects(boardId);
+
+      if (projects) {
+        set((state) => {
+          const oldProjects = state.projects;
+          return {
+            projects: projects.map((project) => {
+              const existing = oldProjects.find((p) => p._id === project._id);
+              return {
+                ...project,
+                tasks: existing?.tasks ?? []
+              };
+            })
+          };
+        });
+      } else {
+        set({ projects: [] });
+      }
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+      set({ projects: [] });
+    } finally {
+      if (isInitialLoad) {
+        set({ isLoadingProjects: false });
+      }
+    }
+  },
+
+  refreshAllTasks: async () => {
+    const { projects } = get();
+    await Promise.all(
+      projects.map(async (project) => {
+        try {
+          const { taskApi } = await import("@/lib/api/taskApi");
+          const tasks = await taskApi.getTasks(project._id);
+          if (Array.isArray(tasks)) {
+            set((state) => ({
+              projects: state.projects.map((p) => (p._id === project._id ? { ...p, tasks } : p))
+            }));
+          }
+        } catch {
+          // keep existing tasks on failure
+        }
+      })
+    );
+  },
+
+  fetchProjectsWithTasks: async (boardId: string) => {
+    await get().fetchProjects(boardId);
+    await get().refreshAllTasks();
+  },
+
+  fetchTasksByProject: async (projectId: string) => {
+    if (!projectId) {
+      return [];
+    }
+
+    try {
+      const { taskApi } = await import("@/lib/api/taskApi");
+      const tasks = await taskApi.getTasks(projectId);
+
+      if (!Array.isArray(tasks)) {
+        return [];
+      }
+
+      set((state) => {
+        const updatedProjects = state.projects.map((project) =>
+          project._id === projectId ? { ...project, tasks } : project
+        );
+        return { projects: updatedProjects };
+      });
+
+      return tasks;
+    } catch (error) {
+      console.error("Error fetching tasks for project:", error);
+      return [];
+    }
+  },
+
+  addProject: async (
+    title: string,
+    description: string,
+    createProject: (project: {
+      title: string;
+      description: string;
+      boardId: string;
+      owner: string;
+      orderInBoard?: number;
+    }) => Promise<Project>
+  ) => {
+    try {
+      const { currentBoardId, userId, projects } = get();
+      if (!currentBoardId) {
+        throw new Error("No board selected");
+      }
+      if (!userId) {
+        throw new Error("User not authenticated");
+      }
+
+      const currentBoardProjects = projects.filter((p) => {
+        const projectBoardId = typeof p.board === "string" ? p.board : p.board?._id;
+        return projectBoardId === currentBoardId;
+      });
+
+      const maxOrder =
+        currentBoardProjects.length > 0
+          ? Math.max(...currentBoardProjects.map((p) => p.orderInBoard ?? 0), -1)
+          : -1;
+
+      const orderInBoard = maxOrder + 1;
+
+      const newProject = await createProject({
+        title,
+        description,
+        boardId: currentBoardId,
+        owner: userId,
+        orderInBoard
+      });
+
+      if (newProject) {
+        set((state) => ({
+          projects: [...state.projects, newProject]
+        }));
+        return newProject._id;
+      }
+
+      throw new Error("Failed to create project");
+    } catch (error) {
+      console.error("Error in addProject:", error);
+      throw error;
+    }
+  },
+
+  updateProject: async (
+    id: string,
+    newTitle: string,
+    newDescription: string | undefined,
+    updateFn: (id: string, data: { title: string; description?: string }) => Promise<Project>
+  ) => {
+    try {
+      set((state) => ({
+        projects: state.projects.map((project) =>
+          project._id === id
+            ? {
+                ...project,
+                title: newTitle,
+                description: newDescription ?? project.description ?? null,
+                updatedAt: new Date().toISOString()
+              }
+            : project
+        )
+      }));
+
+      const userId = get().userId;
+      if (!userId) {
+        throw new Error("User not authenticated");
+      }
+
+      const updateData = {
+        title: newTitle,
+        description: newDescription ?? ""
+      };
+
+      await updateFn(id, updateData);
+    } catch (error) {
+      console.error("Error updating project:", error);
+      set((state) => ({
+        projects: state.projects.map((project) => (project._id === id ? project : project))
+      }));
+      throw error;
+    }
+  },
+
+  removeProject: async (id: string, deleteFn: (id: string) => Promise<void>) => {
+    try {
+      await deleteFn(id);
+
+      set((state) => ({
+        projects: state.projects.filter((project) => project._id !== id)
+      }));
+    } catch (error) {
+      console.error("Error removing project:", error);
+      throw error;
+    }
+  }
+});
