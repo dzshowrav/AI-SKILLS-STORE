@@ -20,6 +20,14 @@
 
 <p align="center"><strong>A curated library of AI instruction packs, skill modules, agent workflows, implementation recipes, and domain-specific playbooks.</strong></p>
 
+<p align="center">
+  <img src="https://img.shields.io/badge/AI-Skills%20Store-Blueprint-blue" alt="AI Skills Store" />
+  <img src="https://img.shields.io/badge/Repository-Collection-success" alt="Repository Collection" />
+  <img src="https://img.shields.io/badge/Use-Agents%20%26%20Workflows-ff69b4" alt="Use Agents and Workflows" />
+  <img src="https://img.shields.io/badge/License-MIT-lightgrey" alt="MIT License" />
+  <img src="https://img.shields.io/badge/Status-Active-brightgreen" alt="Active Status" />
+</p>
+
 <p align="center">This repository is designed for builders who want to move faster with AI assistants, coding agents, automation tools, and specialized knowledge systems.</p>
 
 ---
