@@ -1,8 +1,23 @@
 # AI Skills Store
 
-A curated library of AI instruction packs, skill modules, agent workflows, implementation recipes, and domain-specific playbooks.
+<p align="center">
+  <svg width="720" height="140" viewBox="0 0 720 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="720" height="140" rx="24" fill="#07111F"/>
+    <rect x="24" y="24" width="92" height="92" rx="20" fill="#0F2747"/>
+    <path d="M56 78V62H72V78H56ZM62 56V46H82V56H62ZM48 88V70H86V88H48Z" fill="#7DD3FC"/>
+    <rect x="136" y="32" width="240" height="20" rx="10" fill="#133A5A"/>
+    <rect x="136" y="60" width="320" height="18" rx="9" fill="#1A4B6B"/>
+    <rect x="136" y="84" width="280" height="18" rx="9" fill="#1F5C7D"/>
+    <rect x="136" y="108" width="200" height="14" rx="7" fill="#2C6A89"/>
+    <circle cx="628" cy="70" r="36" fill="#0F2747" stroke="#7DD3FC" stroke-width="4"/>
+    <path d="M612 70H644" stroke="#7DD3FC" stroke-width="4" stroke-linecap="round"/>
+    <path d="M628 54V86" stroke="#7DD3FC" stroke-width="4" stroke-linecap="round"/>
+  </svg>
+</p>
 
-This repository is designed for builders who want to move faster with AI assistants, coding agents, automation tools, and specialized knowledge systems.
+<p align="center"><strong>A curated library of AI instruction packs, skill modules, agent workflows, implementation recipes, and domain-specific playbooks.</strong></p>
+
+<p align="center">This repository is designed for builders who want to move faster with AI assistants, coding agents, automation tools, and specialized knowledge systems.</p>
 
 ---
 
