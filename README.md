@@ -1,17 +1,20 @@
 # AI Skills Store
 
 <p align="center">
-  <svg width="720" height="140" viewBox="0 0 720 140" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="720" height="140" rx="24" fill="#07111F"/>
-    <rect x="24" y="24" width="92" height="92" rx="20" fill="#0F2747"/>
-    <path d="M56 78V62H72V78H56ZM62 56V46H82V56H62ZM48 88V70H86V88H48Z" fill="#7DD3FC"/>
-    <rect x="136" y="32" width="240" height="20" rx="10" fill="#133A5A"/>
-    <rect x="136" y="60" width="320" height="18" rx="9" fill="#1A4B6B"/>
-    <rect x="136" y="84" width="280" height="18" rx="9" fill="#1F5C7D"/>
-    <rect x="136" y="108" width="200" height="14" rx="7" fill="#2C6A89"/>
-    <circle cx="628" cy="70" r="36" fill="#0F2747" stroke="#7DD3FC" stroke-width="4"/>
-    <path d="M612 70H644" stroke="#7DD3FC" stroke-width="4" stroke-linecap="round"/>
-    <path d="M628 54V86" stroke="#7DD3FC" stroke-width="4" stroke-linecap="round"/>
+  <svg width="860" height="180" viewBox="0 0 860 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="860" height="180" rx="28" fill="#07111F"/>
+    <rect x="24" y="24" width="110" height="110" rx="24" fill="#0F2747"/>
+    <path d="M56 104V74H86V104H56ZM68 66V48H98V66H68ZM46 116V90H104V116H46Z" fill="#7DD3FC"/>
+    <rect x="156" y="38" width="220" height="18" rx="9" fill="#153C5C"/>
+    <rect x="156" y="68" width="300" height="16" rx="8" fill="#1D4E6D"/>
+    <rect x="156" y="94" width="260" height="16" rx="8" fill="#256A85"/>
+    <rect x="156" y="120" width="180" height="12" rx="6" fill="#2F7A90"/>
+    <rect x="590" y="42" width="118" height="26" rx="13" fill="#0F2747" stroke="#7DD3FC" stroke-width="2"/>
+    <rect x="590" y="78" width="160" height="26" rx="13" fill="#0F2747" stroke="#7DD3FC" stroke-width="2"/>
+    <rect x="590" y="114" width="142" height="26" rx="13" fill="#0F2747" stroke="#7DD3FC" stroke-width="2"/>
+    <circle cx="748" cy="84" r="38" fill="#102B45" stroke="#7DD3FC" stroke-width="3"/>
+    <path d="M732 84H764" stroke="#7DD3FC" stroke-width="3" stroke-linecap="round"/>
+    <path d="M748 68V100" stroke="#7DD3FC" stroke-width="3" stroke-linecap="round"/>
   </svg>
 </p>
 
