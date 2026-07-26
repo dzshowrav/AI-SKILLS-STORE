@@ -1,0 +1,8 @@
+(env
+ (static
+  (flags
+   (:standard -ccopt -static))))
+
+(executable
+ (name bin)
+ (libraries sury-ppx))

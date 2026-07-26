@@ -1,0 +1,38 @@
+{
+  "name": "sury-ppx",
+  "version": "11.0.0-alpha.9",
+  "description": "⚙️ ReScript PPX to generate Sury schema from types",
+  "keywords": [
+    "Sury",
+    "ReScript",
+    "Schema",
+    "PPX",
+    "Decco",
+    "Spice"
+  ],
+  "homepage": "https://github.com/DZakh/sury/tree/main/packages/sury-ppx#readme",
+  "bugs": {
+    "url": "https://github.com/DZakh/sury/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DZakh/sury.git"
+  },
+  "license": "MIT",
+  "author": "Dmitry Zakharov <dzakh.dev@gmail.com>",
+  "files": [
+    "install.cjs",
+    "ppx-windows.exe",
+    "ppx-linux.exe",
+    "ppx-linux-arm.exe",
+    "ppx-osx.exe",
+    "bin.cmd",
+    "bin"
+  ],
+  "scripts": {
+    "postinstall": "node ./install.cjs"
+  },
+  "peerDependencies": {
+    "sury": "^11.0.0-alpha.9"
+  }
+}

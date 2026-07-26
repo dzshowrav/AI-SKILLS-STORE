@@ -1,0 +1,39 @@
+<h1>Type.Refine</h1>
+<p>The Refine function applies explicit validation logic to a type. Unlike structural type checks, Refine allows you to express constraints that cannot be captured by JSON Schema alone, such as cross-property checks, mathematical properties, or domain-specific business rules.</p>
+<h2>Example</h2>
+<p>The following creates a Refine type that validates a number is prime.</p>
+<pre><code class="language-typescript">import Type from &#39;typebox&#39;
+
+// ------------------------------------------------------------------
+// IsPrime
+// ------------------------------------------------------------------
+const IsPrime = (value: number): boolean =&gt; {
+  if (value &lt;= 1) return false
+  for (let i = 2; i &lt;= Math.sqrt(value); i++)
+    if (value % i === 0) return false
+  return true
+}
+// ------------------------------------------------------------------
+// Prime
+// ------------------------------------------------------------------
+
+type Prime = Type.Static&lt;typeof Prime&gt;      // type Prime = number
+                                            //              |
+                                            //              infer from TNumber
+
+const Prime = Type.Refine(Type.Number(),    // const Prime = {
+  value =&gt; IsPrime(value),                  //   type: &quot;number&quot;,
+  value =&gt; `Value ${value} is not Prime`)   //   &quot;~refine&quot;: [{ 
+                                            //     check: (value) =&gt; {...}, 
+                                            //     error: (value) =&gt; {...}
+                                            //   }]
+                                            // }
+
+const E = Value.Errors(Prime, 42)           // const E = [{
+                                            //   keyword: &quot;~refine&quot;,
+                                            //   schemaPath: &quot;#&quot;,
+                                            //   instancePath: &quot;&quot;,
+                                            //   params: { index: 0, message: &quot;Value 42 is not Prime&quot; },
+                                            //   message: &quot;Value 42 is not Prime&quot;
+                                            // }]
+</code></pre>

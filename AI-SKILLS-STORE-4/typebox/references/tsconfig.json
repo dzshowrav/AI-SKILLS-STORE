@@ -1,0 +1,24 @@
+// ------------------------------------------------------------------
+// TypeScript-7: Strict Required
+// ------------------------------------------------------------------
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES2020",
+    "module": "ESNext",
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "exactOptionalPropertyTypes": true,
+    "paths": {
+      "typebox/compile": ["./src/compile/index.ts"],
+      "typebox/errors": ["./src/errors/index.ts"],
+      "typebox/format": ["./src/format/index.ts"],
+      "typebox/guard": ["./src/guard/index.ts"],
+      "typebox/schema": ["./src/schema/index.ts"],
+      "typebox/system": ["./src/system/index.ts"],
+      "typebox/type": ["./src/type/index.ts"],
+      "typebox/value": ["./src/value/index.ts"],
+      "typebox": ["./src/index.ts"]
+    }
+  }
+}

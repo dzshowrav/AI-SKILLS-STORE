@@ -1,0 +1,241 @@
+import { Settings } from 'typebox/system'
+import { Value } from 'typebox/value'
+import { Type } from 'typebox'
+import { Assert } from 'test'
+
+const Test = Assert.Context('Value.Clean.Union')
+
+// ----------------------------------------------------------------
+// Clean
+// ----------------------------------------------------------------
+Test('Should Clean 1', () => {
+  const T = Type.Union([Type.Number(), Type.Boolean()])
+  const R = Value.Clean(T, null)
+  Assert.IsEqual(R, null)
+})
+Test('Should Clean 2', () => {
+  const T = Type.Union([Type.Number(), Type.Boolean()])
+  const R = Value.Clean(T, 1)
+  Assert.IsEqual(R, 1)
+})
+Test('Should Clean 2', () => {
+  const T = Type.Union([Type.Number(), Type.Boolean()])
+  const R = Value.Clean(T, true)
+  Assert.IsEqual(R, true)
+})
+// ----------------------------------------------------------------
+// Clean Select
+// ----------------------------------------------------------------
+Test('Should Clean 3', () => {
+  const X = Type.Object({ x: Type.Number() })
+  const Y = Type.Object({ y: Type.Number() })
+  const T = Type.Union([X, Y])
+  const R = Value.Clean(T, null)
+  Assert.IsEqual(R, null)
+})
+Test('Should Clean 4', () => {
+  const X = Type.Object({ x: Type.Number() })
+  const Y = Type.Object({ y: Type.Number() })
+  const T = Type.Union([X, Y])
+  const R = Value.Clean(T, {})
+  Assert.IsEqual(R, {})
+})
+Test('Should Clean 5', () => {
+  const X = Type.Object({ x: Type.Number() })
+  const Y = Type.Object({ y: Type.Number() })
+  const T = Type.Union([X, Y])
+  const R = Value.Clean(T, { x: null })
+  Assert.IsEqual(R, { x: null })
+})
+Test('Should Clean 6', () => {
+  const X = Type.Object({ x: Type.Number() })
+  const Y = Type.Object({ y: Type.Number() })
+  const T = Type.Union([X, Y])
+  const R = Value.Clean(T, { y: null })
+  Assert.IsEqual(R, { y: null })
+})
+// ----------------------------------------------------------------
+// Clean Select Discard
+// ----------------------------------------------------------------
+Test('Should Clean 7', () => {
+  const X = Type.Object({ x: Type.Number() })
+  const Y = Type.Object({ y: Type.Number() })
+  const T = Type.Union([X, Y])
+  const R = Value.Clean(T, null)
+  Assert.IsEqual(R, null)
+})
+Test('Should Clean 8', () => {
+  const X = Type.Object({ x: Type.Number() })
+  const Y = Type.Object({ y: Type.Number() })
+  const T = Type.Union([X, Y])
+  const R = Value.Clean(T, { u: null })
+  Assert.IsEqual(R, { u: null }) // no match
+})
+Test('Should Clean 9', () => {
+  const X = Type.Object({ x: Type.Number() })
+  const Y = Type.Object({ y: Type.Number() })
+  const T = Type.Union([X, Y])
+  const R = Value.Clean(T, { u: null, x: 1 })
+  Assert.IsEqual(R, { x: 1 })
+})
+Test('Should Clean 10', () => {
+  const X = Type.Object({ x: Type.Number() })
+  const Y = Type.Object({ y: Type.Number() })
+  const T = Type.Union([X, Y])
+  const R = Value.Clean(T, { u: null, y: 1 })
+  Assert.IsEqual(R, { y: 1 })
+})
+// ----------------------------------------------------------------
+// Clean Select Retain
+// ----------------------------------------------------------------
+Test('Should Clean 12', () => {
+  const X = Type.Object({ x: Type.Number() }, { additionalProperties: Type.Null() })
+  const Y = Type.Object({ y: Type.Number() }, { additionalProperties: Type.Null() })
+  const T = Type.Union([X, Y])
+  const R = Value.Clean(T, null)
+  Assert.IsEqual(R, null)
+})
+Test('Should Clean 13', () => {
+  const X = Type.Object({ x: Type.Number() }, { additionalProperties: Type.Null() })
+  const Y = Type.Object({ y: Type.Number() }, { additionalProperties: Type.Null() })
+  const T = Type.Union([X, Y])
+  const R = Value.Clean(T, { u: null })
+  Assert.IsEqual(R, { u: null })
+})
+Test('Should Clean 14', () => {
+  const X = Type.Object({ x: Type.Number() }, { additionalProperties: Type.Null() })
+  const Y = Type.Object({ y: Type.Number() }, { additionalProperties: Type.Null() })
+  const T = Type.Union([X, Y])
+  const R = Value.Clean(T, { u: null, x: 1 })
+  Assert.IsEqual(R, { u: null, x: 1 })
+})
+Test('Should Clean 15', () => {
+  const X = Type.Object({ x: Type.Number() }, { additionalProperties: Type.Null() })
+  const Y = Type.Object({ y: Type.Number() }, { additionalProperties: Type.Null() })
+  const T = Type.Union([X, Y])
+  const R = Value.Clean(T, { u: null, y: 1 })
+  Assert.IsEqual(R, { u: null, y: 1 })
+})
+// ----------------------------------------------------------------
+// Clean Select First and Discard
+// ----------------------------------------------------------------
+Test('Should Clean 16', () => {
+  const X = Type.Object({ x: Type.Number() })
+  const Y = Type.Object({ y: Type.Number() }, { additionalProperties: Type.Null() })
+  const T = Type.Union([X, Y])
+  const R = Value.Clean(T, { u: null, x: 1 })
+  Assert.IsEqual(R, { x: 1 })
+})
+Test('Should Clean 17', () => {
+  const X = Type.Object({ x: Type.Number() })
+  const Y = Type.Object({ y: Type.Number() }, { additionalProperties: Type.Null() })
+  const T = Type.Union([X, Y])
+  const R = Value.Clean(T, { u: null, y: 1 })
+  Assert.IsEqual(R, { u: null, y: 1 })
+})
+
+Test('Should Clean 17', () => {
+  const X = Type.Object({ x: Type.Number() })
+  const Y = Type.Object({ y: Type.Number() }, { additionalProperties: Type.Null() })
+  const T = Type.Union([X, Y])
+  const R = Value.Clean(T, { u: null, y: 1 })
+  Assert.IsEqual(R, { u: null, y: 1 })
+})
+// ------------------------------------------------------------------
+// https://github.com/sinclairzx81/typebox/issues/1343
+// ------------------------------------------------------------------
+Test('Should Clean 18', () => {
+  const T = Type.Union([
+    Type.Object({ oneof_prop_a: Type.String() }),
+    Type.Object({ oneof_prop_b: Type.Optional(Type.String()) })
+  ])
+  const A = Value.Clean(T, { oneof_prop_a: 'A' })
+  Assert.IsEqual(A, { oneof_prop_a: 'A' })
+})
+Test('Should Clean 19', () => {
+  const T = Type.Union([
+    Type.Object({ oneof_prop_a: Type.String() }),
+    Type.Object({ oneof_prop_b: Type.Optional(Type.String()) })
+  ])
+  const A = Value.Clean(T, { oneof_prop_b: 'B' })
+  Assert.IsEqual(A, { oneof_prop_b: 'B' })
+})
+Test('Should Clean 20', () => {
+  const T = Type.Union([
+    Type.Object({ oneof_prop_a: Type.String() }),
+    Type.Object({ oneof_prop_b: Type.Optional(Type.String()) })
+  ])
+  const A = Value.Clean(T, { oneof_prop_b: undefined })
+  Assert.IsEqual(A, { oneof_prop_b: undefined })
+})
+Test('Should Clean 21', () => {
+  const T = Type.Union([
+    Type.Object({ oneof_prop_a: Type.String() }),
+    Type.Object({ oneof_prop_b: Type.Optional(Type.String()) })
+  ])
+  const A = Value.Clean(T, {})
+  Assert.IsEqual(A, {})
+})
+// ------------------------------------------------------------------
+// Support Order Independent Union Variants
+//
+// https://github.com/sinclairzx81/typebox/issues/1515
+// ------------------------------------------------------------------
+Test('Should Clean 22', () => {
+  const VariantA = Type.Object({
+    x: Type.Number(),
+    y: Type.Number()
+  })
+  const VariantB = Type.Object({
+    x: Type.Number(),
+    y: Type.Number(),
+    z: Type.Number()
+  })
+  const OrderA = Type.Object({
+    value: Type.Union([VariantB, VariantA])
+  })
+  const OrderB = Type.Object({
+    value: Type.Union([VariantA, VariantB])
+  })
+  const A = Value.Clean(OrderA, {
+    value: {
+      x: 1,
+      y: 2,
+      z: 3,
+      w: 4
+    }
+  })
+  const B = Value.Clean(OrderB, {
+    value: {
+      x: 1,
+      y: 2,
+      z: 3,
+      w: 4
+    }
+  })
+  Assert.IsEqual(A, { value: { x: 1, y: 2, z: 3 } })
+  Assert.IsEqual(B, { value: { x: 1, y: 2, z: 3 } })
+})
+// ------------------------------------------------------------------
+// UnionPrioritySort
+// ------------------------------------------------------------------
+Test('Should Clean 23', () => {
+  Settings.Set({ unionPrioritySort: false })
+  const A = Type.Union([
+    Type.Object({ x: Type.Number() }),
+    Type.Object({ x: Type.Number(), y: Type.Number() })
+  ])
+  // matched on first variant
+  const R = Value.Clean(A, { x: 1, y: 2, w: 4 })
+  Assert.IsEqual(R, { x: 1 })
+  Settings.Reset()
+})
+Test('Should Clean 24', () => {
+  const A = Type.Union([
+    Type.Object({ x: Type.Number() }),
+    Type.Object({ x: Type.Number(), y: Type.Number() })
+  ])
+  // matched on second variant
+  const R = Value.Clean(A, { x: 1, y: 2, w: 4 })
+  Assert.IsEqual(R, { x: 1, y: 2 })
+})

@@ -1,0 +1,10 @@
+(library
+ (name RescriptSchemaPpx)
+ (public_name sury-ppx)
+ (kind ppx_rewriter)
+ (libraries ppxlib)
+ (flags
+  (:standard -w -9))
+ ; 9 = labels not bound in record pattern
+ (preprocess
+  (pps ppxlib.metaquot)))

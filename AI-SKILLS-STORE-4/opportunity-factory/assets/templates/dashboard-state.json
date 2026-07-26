@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "lastUpdated": "YYYY-MM-DDTHH:mm:ssZ",
+  "executiveSummary": {
+    "status": "operational",
+    "summary": "<compact factory status>",
+    "sourceOfTruthForStatusAnswers": true
+  },
+  "activeCandidate": {
+    "id": "<candidate-id>",
+    "name": "<candidate name>",
+    "phase": "<phase>",
+    "gate": "GO|PIVOT|PARK|UNKNOWN",
+    "gateConfidence": "observed|degraded|estimated|unknown",
+    "status": "<compact status>",
+    "latestEvidence": [],
+    "nextGate": "<next gate>",
+    "mustNot": []
+  },
+  "portfolio": {
+    "topNLimit": 10,
+    "activeTopNCount": 0,
+    "watchlistCount": 0,
+    "rejectedCount": 0,
+    "statePath": "<portfolio-state-path>",
+    "status": "<portfolio status>"
+  },
+  "workflows": [],
+  "promptAssets": {
+    "dashboardContract": "<path>",
+    "workflowReview": "<path>",
+    "promptSelfImprovement": "<path>",
+    "status": "not_configured|configured|needs_review"
+  },
+  "prototypeLane": {
+    "status": "not_configured|configured_gated|active|blocked",
+    "wipLimit": 1,
+    "currentWip": null,
+    "verification": "<platform verification status>",
+    "blockedReason": null
+  },
+  "portfolioPromotion": {
+    "status": "not_configured|waiting|active|blocked",
+    "wipLimit": 1,
+    "currentWip": null,
+    "stage": null,
+    "pendingQueuePath": "<path>",
+    "doneQueuePath": "<path>"
+  },
+  "productMaturation": {
+    "status": "not_configured|waiting_for_go|active|private_release_ready|blocked",
+    "wipLimit": 1,
+    "currentWip": null,
+    "stage": null,
+    "implementationSlicesCompleted": 0,
+    "maxImplementationSlices": 0,
+    "pendingQueuePath": "<path>",
+    "doneQueuePath": "<path>"
+  },
+  "automationPolicy": {
+    "approvedUnattendedAutomations": [],
+    "allowedWithReviewerAndQueueGate": [
+      "local private research",
+      "local private design",
+      "local private prototype/code work explicitly authorized by the user"
+    ],
+    "approvalRequiredFor": [
+      "new unattended schedules",
+      "higher frequency",
+      "public assets",
+      "paid services or account creation",
+      "secret write, issue, delete, or external send",
+      "personal data external send",
+      "backup-impossible destructive changes",
+      "legal-risk acceptance",
+      "schedule frequency increase",
+      "approval gate weakening"
+    ]
+  },
+  "queues": {
+    "pending": [],
+    "doneCount": 0,
+    "pendingCount": 0
+  },
+  "decisions": [],
+  "risksAndBlockers": [],
+  "nextActions": [],
+  "answeringPolicy": {
+    "useDashboardFirst": true,
+    "thenVerifyWith": [
+      "factory-state/tasks-pending.json",
+      "factory-state/tasks-done.json",
+      "factory-state/outcome-log.json",
+      "factory-state/portfolio-promotion-state.json",
+      "factory-state/portfolio-tasks-pending.json",
+      "factory-state/portfolio-tasks-done.json",
+      "factory-state/product-maturation-state.json",
+      "factory-state/product-tasks-pending.json",
+      "factory-state/product-tasks-done.json",
+      "factory-state/pipeline-log.jsonl",
+      "factory-state/artifacts/*.md"
+    ],
+    "ifConflict": "Prefer newest durable artifact/log, update dashboard, then answer."
+  }
+}

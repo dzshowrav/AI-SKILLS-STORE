@@ -1,0 +1,16 @@
+<h1>Type.Partial</h1>
+<p>This type is an alias for the <code>Partial&lt;T&gt;</code> TypeScript utility type. It makes all properties of an Object optional.</p>
+<h2>Example</h2>
+<p>Example usage is shown below.</p>
+<pre><code class="language-typescript">const T = Type.Object({                             // const T: TObject&lt;{
+  x: Type.Number(),                                 //   x: TNumber,
+  y: Type.Number(),                                 //   y: TNumber,
+  z: Type.Number()                                  //   z: TNumber
+})                                                  // }&gt;
+
+const S = Type.Partial(T)                           // const S: TObject&lt;{
+                                                    //   x: TOptional&lt;TNumber&gt;,
+                                                    //   y: TOptional&lt;TNumber&gt;,
+                                                    //   z: TOptional&lt;TNumber&gt;
+                                                    // }&gt;
+</code></pre>

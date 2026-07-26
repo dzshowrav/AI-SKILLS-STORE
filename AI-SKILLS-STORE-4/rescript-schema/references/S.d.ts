@@ -1,0 +1,1046 @@
+/** The Standard Schema interface. */
+export interface StandardSchemaV1<Input = unknown, Output = Input> {
+  /** The Standard Schema properties. */
+  readonly "~standard": StandardSchemaV1.Props<Input, Output>;
+}
+
+export declare namespace StandardSchemaV1 {
+  /** The Standard Schema properties interface. */
+  export interface Props<Input = unknown, Output = Input> {
+    /** The version number of the standard. */
+    readonly version: 1;
+    /** The vendor name of the schema library. */
+    readonly vendor: string;
+    /** Validates unknown input values. */
+    readonly validate: (
+      value: unknown
+    ) => Result<Output> | Promise<Result<Output>>;
+    /** Inferred types associated with the schema. */
+    readonly types?: Types<Input, Output> | undefined;
+  }
+
+  /** The result interface of the validate function. */
+  export type Result<Output> = SuccessResult<Output> | FailureResult;
+
+  /** The result interface if validation succeeds. */
+  export interface SuccessResult<Output> {
+    /** The typed output value. */
+    readonly value: Output;
+    /** The non-existent issues. */
+    readonly issues?: undefined;
+  }
+
+  /** The result interface if validation fails. */
+  export interface FailureResult {
+    /** The issues of failed validation. */
+    readonly issues: ReadonlyArray<Issue>;
+  }
+
+  /** The issue interface of the failure output. */
+  export interface Issue {
+    /** The error message of the issue. */
+    readonly message: string;
+    /** The path of the issue, if any. */
+    readonly path?: ReadonlyArray<PropertyKey | PathSegment> | undefined;
+  }
+
+  /** The path segment interface of the issue. */
+  export interface PathSegment {
+    /** The key representing a path segment. */
+    readonly key: PropertyKey;
+  }
+
+  /** The Standard Schema types interface. */
+  export interface Types<Input = unknown, Output = Input> {
+    /** The input type of the schema. */
+    readonly input: Input;
+    /** The output type of the schema. */
+    readonly output: Output;
+  }
+
+  /** Infers the input type of a Standard Schema. */
+  export type InferInput<Schema extends StandardSchemaV1> = NonNullable<
+    Schema["~standard"]["types"]
+  >["input"];
+
+  /** Infers the output type of a Standard Schema. */
+  export type InferOutput<Schema extends StandardSchemaV1> = NonNullable<
+    Schema["~standard"]["types"]
+  >["output"];
+}
+
+/**
+ * The Standard Typed interface.
+ * This is a base type extended by other specs.
+ */
+export interface StandardTypedV1<Input = unknown, Output = Input> {
+  readonly "~standard": StandardTypedV1.Props<Input, Output>;
+}
+
+export declare namespace StandardTypedV1 {
+  export interface Props<Input = unknown, Output = Input> {
+    readonly version: 1;
+    readonly vendor: string;
+    readonly types?: Types<Input, Output> | undefined;
+  }
+  export interface Types<Input = unknown, Output = Input> {
+    readonly input: Input;
+    readonly output: Output;
+  }
+  export type InferInput<Schema extends StandardTypedV1> = NonNullable<
+    Schema["~standard"]["types"]
+  >["input"];
+  export type InferOutput<Schema extends StandardTypedV1> = NonNullable<
+    Schema["~standard"]["types"]
+  >["output"];
+}
+
+/** The Standard JSON Schema interface. https://standardschema.dev/json-schema */
+export interface StandardJSONSchemaV1<Input = unknown, Output = Input> {
+  readonly "~standard": StandardJSONSchemaV1.Props<Input, Output>;
+}
+
+export declare namespace StandardJSONSchemaV1 {
+  export interface Props<Input = unknown, Output = Input>
+    extends StandardTypedV1.Props<Input, Output> {
+    readonly jsonSchema: StandardJSONSchemaV1.Converter;
+  }
+  export interface Converter {
+    readonly input: (options: StandardJSONSchemaV1.Options) => Record<string, unknown>;
+    readonly output: (options: StandardJSONSchemaV1.Options) => Record<string, unknown>;
+  }
+  export type Target =
+    | "draft-2020-12"
+    | "draft-07"
+    | "openapi-3.0"
+    | ({} & string);
+  export interface Options {
+    readonly target: Target;
+    readonly libraryOptions?: Record<string, unknown> | undefined;
+  }
+  export interface Types<Input = unknown, Output = Input>
+    extends StandardTypedV1.Types<Input, Output> {}
+  export type InferInput<Schema extends StandardTypedV1> =
+    StandardTypedV1.InferInput<Schema>;
+  export type InferOutput<Schema extends StandardTypedV1> =
+    StandardTypedV1.InferOutput<Schema>;
+}
+
+
+export type SuccessResult<Value> = {
+  readonly success: true;
+  readonly value: Value;
+  readonly error?: undefined;
+};
+
+export type FailureResult = {
+  readonly success: false;
+  readonly error: Error;
+};
+
+export type Result<Value> = SuccessResult<Value> | FailureResult;
+
+export type JSON =
+  | string
+  | boolean
+  | number
+  | null
+  | { [key: string]: JSON }
+  | JSON[];
+
+export type NumberFormat = "int32" | "port";
+export type StringFormat = "json" | "date-time" | "email" | "uuid" | "cuid" | "url";
+export type ArrayFormat = "compactColumns";
+export type Format = NumberFormat | StringFormat | ArrayFormat;
+
+export type Schema<Output, Input = unknown> = {
+  with<TargetOutput = unknown, TargetInput = unknown>(
+    to: (
+      schema: Schema<unknown, unknown>,
+      target: Schema<unknown, unknown>,
+      decode?: ((value: unknown) => unknown) | undefined,
+      encode?: (value: unknown) => Output
+    ) => Schema<unknown, unknown>,
+    target: SchemaLike<TargetOutput, TargetInput>,
+    decode?: ((value: Output) => TargetInput) | undefined,
+    encode?: (value: TargetOutput) => Output
+  ): Schema<TargetOutput, Input>;
+  with(
+    refine: (
+      schema: Schema<unknown, unknown>,
+      refineCheck: (value: unknown) => boolean,
+      refineOptions?: { error?: string; path?: string[] }
+    ) => Schema<unknown, unknown>,
+    refineCheck: (value: Output) => boolean,
+    refineOptions?: { error?: string; path?: string[] }
+  ): Schema<Output, Input>;
+  // This overload is what both S.refine and S.shape resolve to under
+  // overload matching — the exact mechanism that routes S.refine calls here
+  // instead of the more specific `refine` overload above hasn't been pinned
+  // down. Treat it as load-bearing for both call sites and verify against
+  // S_refine_test.res / S_shape_test.res before changing its shape.
+  with<Shape>(
+    fn: (
+      schema: Schema<unknown, unknown>,
+      callback: ((value: unknown) => unknown) | undefined
+    ) => Schema<unknown, unknown>,
+    callback: ((value: Output) => Shape) | undefined
+  ): Schema<Shape, Input>;
+  with<O, I>(fn: (schema: Schema<Output, Input>) => SchemaLike<O, I>): Schema<O, I>;
+  // Constraining A1 to string makes a string-literal arg1 (e.g.
+  // `.with(S.brand, "myId")`) infer its literal type instead of widening to
+  // `string` — needed for brand-based nominal typing. The next overload
+  // covers the general (non-string) arg1 case.
+  with<O, I, A1 extends string>(
+    fn: (schema: Schema<Output, Input>, arg1: A1) => SchemaLike<O, I>,
+    arg1: A1
+  ): Schema<O, I>;
+  with<O, I, A1>(
+    fn: (schema: Schema<Output, Input>, arg1: A1) => SchemaLike<O, I>,
+    arg1: A1
+  ): Schema<O, I>;
+  with<O, I, A1, A2>(
+    fn: (schema: Schema<Output, Input>, arg1: A1, arg2: A2) => SchemaLike<O, I>,
+    arg1: A1,
+    arg2: A2
+  ): Schema<O, I>;
+
+  readonly $defs?: Record<string, Schema<unknown>>;
+
+  readonly name?: string;
+  readonly title?: string;
+  readonly description?: string;
+  readonly deprecated?: boolean;
+  readonly examples?: Input[];
+  readonly noValidation?: boolean;
+  readonly default?: Input;
+  readonly to?: Schema<unknown>;
+  readonly errorMessage?: SchemaErrorMessage;
+
+  // jsonSchema.input/.output throw until enableStandardJSONSchema() is called.
+  readonly ["~standard"]: StandardSchemaV1.Props<Input, Output> &
+    StandardJSONSchemaV1.Props<Input, Output>;
+} & (
+  | {
+      readonly type: "never";
+    }
+  | {
+      readonly type: "unknown";
+    }
+  | {
+      readonly type: "string";
+      readonly format?: StringFormat;
+      readonly const?: string;
+      readonly minLength?: number;
+      readonly maxLength?: number;
+      readonly pattern?: RegExp;
+    }
+  | {
+      readonly type: "number";
+      readonly format?: NumberFormat;
+      readonly const?: number;
+      readonly minimum?: number;
+      readonly maximum?: number;
+    }
+  | {
+      readonly type: "bigint";
+      readonly const?: bigint;
+    }
+  | {
+      readonly type: "boolean";
+      readonly const?: boolean;
+    }
+  | {
+      readonly type: "symbol";
+      readonly const?: symbol;
+    }
+  | {
+      readonly type: "null";
+      readonly const: null;
+    }
+  | {
+      readonly type: "undefined";
+      readonly const: undefined;
+    }
+  | {
+      readonly type: "nan";
+      readonly const: number;
+    }
+  | {
+      readonly type: "function";
+      readonly const?: Input;
+    }
+  | {
+      readonly type: "instance";
+      readonly class: Class<Input>;
+      readonly const?: Input;
+    }
+  | {
+      readonly type: "array";
+      readonly items: Schema<unknown>;
+      readonly additionalItems: AdditionalItemsMode | Schema<unknown>;
+      readonly format?: ArrayFormat;
+      readonly minItems?: number;
+      readonly maxItems?: number;
+    }
+  | {
+      readonly type: "object";
+      readonly properties: {
+        [key: string]: Schema<unknown>;
+      };
+      readonly additionalItems: AdditionalItemsMode | Schema<unknown>;
+      readonly required?: string[];
+    }
+  | {
+      readonly type: "union";
+      readonly anyOf: Schema<unknown>[];
+      readonly has: Record<
+        | "string"
+        | "number"
+        | "never"
+        | "unknown"
+        | "bigint"
+        | "boolean"
+        | "symbol"
+        | "null"
+        | "undefined"
+        | "nan"
+        | "function"
+        | "instance"
+        | "array"
+        | "object",
+        boolean
+      >;
+    }
+  | {
+      readonly type: "ref";
+      readonly $ref: string;
+    }
+);
+
+export abstract class Path {
+  protected opaque: unknown;
+} /* simulate opaque types */
+
+type BaseError = {
+  readonly path: Path;
+  readonly message: string;
+  readonly reason: string;
+};
+
+export type Error =
+  | (BaseError & {
+      readonly code: "invalid_input";
+      readonly expected: Schema<unknown>;
+      readonly received: Schema<unknown>;
+      readonly input?: unknown;
+      readonly unionErrors?: readonly Error[];
+    })
+  | (BaseError & {
+      readonly code: "invalid_operation";
+    })
+  | (BaseError & {
+      readonly code: "unsupported_decode";
+      readonly from: Schema<unknown>;
+      readonly to: Schema<unknown>;
+    })
+  | (BaseError & {
+      readonly code: "invalid_conversion";
+      readonly from: Schema<unknown>;
+      readonly to: Schema<unknown>;
+      readonly cause?: unknown;
+    })
+  | (BaseError & {
+      readonly code: "unrecognized_keys";
+      readonly keys: readonly string[];
+    });
+
+export const Error: {
+  new (): Error;
+  prototype: Error;
+};
+
+// Extract Output/Input by matching only the `~standard` marker instead of the
+// full `Schema<…>` shape (whose 14-member union + `with` overloads are costly to
+// instantiate per match). `types` is optional, so the pattern keeps it optional.
+export type Output<T> = T extends {
+  readonly ["~standard"]: { readonly types?: { readonly output: infer Output } };
+}
+  ? Output
+  : never;
+export type Infer<T> = Output<T>;
+export type Input<T> = T extends {
+  readonly ["~standard"]: { readonly types?: { readonly input: infer Input } };
+}
+  ? Input
+  : never;
+
+// Utility types for decoder function with multiple schemas
+type ExtractFirstInput<T extends readonly SchemaLike<any, any>[]> =
+  T extends readonly [SchemaLike<any, infer FirstInput>, ...any[]]
+    ? FirstInput
+    : never;
+
+// Utility types for encoder function with multiple schemas
+type ExtractFirstOutput<T extends readonly SchemaLike<any, any>[]> =
+  T extends readonly [SchemaLike<infer FirstOutput, any>, ...any[]]
+    ? FirstOutput
+    : never;
+
+type ExtractLastOutput<T extends readonly SchemaLike<any, any>[]> =
+  T extends readonly [...any[], SchemaLike<infer LastOutput, any>]
+    ? LastOutput
+    : T extends readonly [SchemaLike<infer SingleOutput, any>]
+    ? SingleOutput
+    : never;
+
+type ExtractLastInput<T extends readonly SchemaLike<any, any>[]> =
+  T extends readonly [...any[], SchemaLike<any, infer LastInput>]
+    ? LastInput
+    : T extends readonly [SchemaLike<any, infer SingleInput>]
+    ? SingleInput
+    : never;
+
+// Match the `~standard` marker instead of the full `Schema<…>` shape for the
+// same instantiation-cost reason as `Output<T>` above.
+// `-readonly` undoes the `readonly` that a `const T` call site (schema/union)
+// stamps onto every nested property — that marker only exists to keep literal
+// types from widening and shouldn't leak into the inferred Output/Input.
+export type UnknownToOutput<T> = T extends {
+  readonly ["~standard"]: { readonly types?: { readonly output: infer Output } };
+}
+  ? Output
+  : T extends (...args: any[]) => any
+  ? T
+  : T extends unknown[]
+  ? { -readonly [K in keyof T]: UnknownToOutput<T[K]> }
+  : T extends { [k in keyof T]: unknown }
+  ? ResolveObject<{ -readonly [K in keyof T]: UnknownToOutput<T[K]> }>
+  : T;
+
+export type UnknownToInput<T> = T extends {
+  readonly ["~standard"]: { readonly types?: { readonly input: infer Input } };
+}
+  ? Input
+  : T extends (...args: any[]) => any
+  ? T
+  : T extends unknown[]
+  ? { -readonly [K in keyof T]: UnknownToInput<T[K]> }
+  : T extends { [k in keyof T]: unknown }
+  ? ResolveObject<{ -readonly [K in keyof T]: UnknownToInput<T[K]> }>
+  : T;
+
+// Lightweight parameter type for inferring a schema's Output/Input: matching
+// the `~standard` marker instead of the full `Schema<…>` shape (14-member
+// union + `with` overloads) keeps per-call instantiation cost low.
+type SchemaLike<Output, Input> = {
+  readonly ["~standard"]: {
+    readonly types?: { readonly output: Output; readonly input: Input } | undefined;
+  };
+};
+
+export type Brand<T, ID extends string> = T & {
+  /**
+   *  TypeScript won't suggest strings beginning with a space as properties.
+   *  Useful for symbol-like string properties.
+   */
+  readonly [" brand"]: [T, ID];
+};
+
+export function brand<ID extends string, Output = unknown, Input = unknown>(
+  schema: SchemaLike<Output, Input>,
+  brandId: ID
+): Schema<Brand<Output, ID>, Input>;
+
+// `R` already holds each field's resolved type. A field is optional iff its type
+// admits `undefined`, so an `S.never` field stays required. The split is skipped
+// when no field is optional. Required keys come first, optional last — matching
+// the ordering Zod (and the wider Standard Schema ecosystem) infers, so a Sury
+// type reads the same as its cross-library equivalent.
+type ResolveObject<R> = undefined extends R[keyof R]
+  ? Flatten<
+      {
+        [K in keyof R as undefined extends R[K] ? never : K]: R[K];
+      } & {
+        [K in keyof R as undefined extends R[K] ? K : never]?: R[K];
+      }
+    >
+  : Flatten<R>;
+
+// Flatten an intersection into one object, keeping values verbatim (incl. `never`).
+type Flatten<T> = T extends object ? { [K in keyof T]: T[K] } : T;
+
+// Homomorphic mapped type over a tuple `T` preserves its arity — a plain
+// (non-tuple) array `T` has `T["length"]` widened to `number`, in which case
+// there's nothing positional to map and `T` is returned as-is.
+type UnknownArrayToOutput<T extends unknown[]> = number extends T["length"]
+  ? T
+  : { -readonly [K in keyof T]: UnknownToOutput<T[K]> };
+type UnknownArrayToInput<T extends unknown[]> = number extends T["length"]
+  ? T
+  : { -readonly [K in keyof T]: UnknownToInput<T[K]> };
+
+export function schema<const T extends unknown[]>(
+  schemas: [...T]
+): Schema<[...UnknownArrayToOutput<T>], [...UnknownArrayToInput<T>]>;
+export function schema<const T>(
+  value: T
+): Schema<UnknownToOutput<T>, UnknownToInput<T>>;
+
+export function literal<const T>(
+  value: T
+): Schema<UnknownToOutput<T>, UnknownToInput<T>>;
+
+export function union<const A, const B extends unknown[]>(
+  schemas: [A, ...B]
+): Schema<
+  UnknownToOutput<A> | UnknownArrayToOutput<B>[number],
+  UnknownToInput<A> | UnknownArrayToInput<B>[number]
+>;
+export function union<const T>(
+  schemas: readonly T[]
+): Schema<UnknownToOutput<T>, UnknownToInput<T>>;
+
+export const string: Schema<string, string>;
+export const boolean: Schema<boolean, boolean>;
+export const int32: Schema<number, number>;
+export const number: Schema<number, number>;
+export const bigint: Schema<bigint, bigint>;
+export const symbol: Schema<symbol, symbol>;
+export const never: Schema<never, never>;
+export const unknown: Schema<unknown, unknown>;
+export const any: Schema<any, any>;
+declare const void_: Schema<void, void>;
+export { void_ as void };
+
+export const json: Schema<JSON, JSON>;
+
+export const jsonString: Schema<string, string>;
+export const jsonStringWithSpace: (space: number) => Schema<string, string>;
+
+export const uint8Array: Schema<Uint8Array, Uint8Array>;
+
+export const isoDateTime: Schema<string, string>;
+
+export const port: Schema<number, number>;
+
+export const email: Schema<string, string>;
+
+export const uuid: Schema<string, string>;
+
+export const cuid: Schema<string, string>;
+
+export const url: Schema<string, string>;
+
+export const date: Schema<Date, Date>;
+
+export function safe<Value>(scope: () => Value): Result<Value>;
+export function safeAsync<Value>(
+  scope: () => Promise<Value>
+): Promise<Result<Value>>;
+
+export function reverse<Output, Input>(
+  schema: SchemaLike<Output, Input>
+): Schema<Input, Output>;
+
+export function parser<Output>(
+  schema: SchemaLike<Output, unknown>
+): (data: unknown) => Output;
+export function parser<Output>(
+  from: SchemaLike<unknown, unknown>,
+  target: SchemaLike<Output, unknown>
+): (data: unknown) => Output;
+export function parser<
+  Schemas extends readonly [SchemaLike<any, any>, ...SchemaLike<any, any>[]]
+>(...schemas: Schemas): (data: unknown) => ExtractLastOutput<Schemas>;
+
+export function asyncParser<Output>(
+  schema: SchemaLike<Output, unknown>
+): (data: unknown) => Promise<Output>;
+export function asyncParser<Output>(
+  from: SchemaLike<unknown, unknown>,
+  target: SchemaLike<Output, unknown>
+): (data: unknown) => Promise<Output>;
+export function asyncParser<
+  Schemas extends readonly [SchemaLike<any, any>, ...SchemaLike<any, any>[]]
+>(...schemas: Schemas): (data: unknown) => Promise<ExtractLastOutput<Schemas>>;
+
+export function decoder<Output, Input>(
+  schema: SchemaLike<Output, Input>
+): (data: Input) => Output;
+export function decoder<Output, Input>(
+  from: SchemaLike<unknown, Input>,
+  target: SchemaLike<Output, unknown>
+): (data: Input) => Output;
+export function decoder<
+  Schemas extends readonly [SchemaLike<any, any>, ...SchemaLike<any, any>[]]
+>(
+  ...schemas: Schemas
+): (data: ExtractFirstInput<Schemas>) => ExtractLastOutput<Schemas>;
+
+export function asyncDecoder<Output, Input>(
+  schema: SchemaLike<Output, Input>
+): (data: Input) => Promise<Output>;
+export function asyncDecoder<Output, Input>(
+  from: SchemaLike<unknown, Input>,
+  target: SchemaLike<Output, unknown>
+): (data: Input) => Promise<Output>;
+export function asyncDecoder<
+  Schemas extends readonly [SchemaLike<any, any>, ...SchemaLike<any, any>[]]
+>(
+  ...schemas: Schemas
+): (data: ExtractFirstInput<Schemas>) => Promise<ExtractLastOutput<Schemas>>;
+
+export function encoder<Output, Input>(
+  schema: SchemaLike<Output, Input>
+): (data: Output) => Input;
+export function encoder<Output, Input>(
+  from: SchemaLike<Output, unknown>,
+  target: SchemaLike<unknown, Input>
+): (data: Output) => Input;
+export function encoder<
+  Schemas extends readonly [SchemaLike<any, any>, ...SchemaLike<any, any>[]]
+>(
+  ...schemas: Schemas
+): (data: ExtractFirstOutput<Schemas>) => ExtractLastInput<Schemas>;
+
+export function asyncEncoder<Output, Input>(
+  schema: SchemaLike<Output, Input>
+): (data: Output) => Promise<Input>;
+export function asyncEncoder<Output, Input>(
+  from: SchemaLike<Output, unknown>,
+  target: SchemaLike<unknown, Input>
+): (data: Output) => Promise<Input>;
+export function asyncEncoder<
+  Schemas extends readonly [SchemaLike<any, any>, ...SchemaLike<any, any>[]]
+>(
+  ...schemas: Schemas
+): (data: ExtractFirstOutput<Schemas>) => Promise<ExtractLastInput<Schemas>>;
+
+export function assert<Output, Input>(
+  schema: SchemaLike<Output, Input>,
+  data: unknown
+): asserts data is Input;
+export function assert<Output, Input>(
+  data: unknown,
+  schema: SchemaLike<Output, Input>
+): asserts data is Input;
+
+export function is<Output, Input>(
+  schema: SchemaLike<Output, Input>,
+  data: unknown
+): data is Input;
+export function is<Output, Input>(
+  data: unknown,
+  schema: SchemaLike<Output, Input>
+): data is Input;
+
+export function tuple<Output, Input extends unknown[]>(
+  definer: (s: {
+    item: <ItemOutput>(
+      inputIndex: number,
+      schema: SchemaLike<ItemOutput, unknown>
+    ) => ItemOutput;
+    tag: (inputIndex: number, value: unknown) => void;
+  }) => Output
+): Schema<Output, Input>;
+export function tuple<const T extends unknown[]>(
+  schemas: [...T]
+): Schema<[...UnknownArrayToOutput<T>], [...UnknownArrayToInput<T>]>;
+
+export function optional<
+  Output,
+  Input,
+  Or extends Output | undefined = undefined
+>(
+  schema: SchemaLike<Output, Input>,
+  or?: (() => Or) | Or,
+  // To make .with work
+  _?: never
+): Schema<
+  Or extends undefined ? Output | undefined : Output,
+  Input | undefined
+>;
+
+export function nullable<
+  Output,
+  Input,
+  Or extends Output | null = null
+>(
+  schema: SchemaLike<Output, Input>,
+  or?: (() => Or) | Or,
+  // To make .with work
+  _?: never
+): Schema<Or extends null ? Output | null : Output, Input | null>;
+
+export const nullish: <Output, Input>(
+  schema: SchemaLike<Output, Input>
+) => Schema<Output | undefined | null, Input | undefined | null>;
+
+export type Class<T> = new (...args: readonly any[]) => T;
+export const instance: <T>(class_: Class<T>) => Schema<T, T>;
+
+export const array: <Output, Input>(
+  schema: SchemaLike<Output, Input>
+) => Schema<Output[], Input[]>;
+
+export const compactColumns: <Output, Input>(
+  schema: SchemaLike<Output, Input>
+) => Schema<Output[][], Input[][]>;
+
+export const record: <Output, Input>(
+  schema: SchemaLike<Output, Input>
+) => Schema<Record<string, Output>, Record<string, Input>>;
+
+type ObjectCtx<Input extends Record<string, unknown>> = {
+  field: <FieldOutput>(
+    name: string,
+    schema: SchemaLike<FieldOutput, unknown>
+  ) => FieldOutput;
+  fieldOr: <FieldOutput>(
+    name: string,
+    schema: SchemaLike<FieldOutput, unknown>,
+    or: FieldOutput
+  ) => FieldOutput;
+  tag: <TagName extends keyof Input>(
+    name: TagName,
+    value: Input[TagName]
+  ) => void;
+  flatten: <FieldOutput>(schema: SchemaLike<FieldOutput, unknown>) => FieldOutput;
+  nested: (name: string) => ObjectCtx<Record<string, unknown>>;
+};
+
+export function object<Output, Input extends Record<string, unknown>>(
+  definer: (ctx: ObjectCtx<Input>) => Output
+): Schema<Output, Input>;
+export function object<T extends Record<string, unknown>>(
+  definition: T
+): Schema<UnknownToOutput<T>, UnknownToInput<T>>;
+
+export function strip<Output, Input extends Record<string, unknown>>(
+  schema: SchemaLike<Output, Input>
+): Schema<Output, Input>;
+export function deepStrip<Output, Input extends Record<string, unknown>>(
+  schema: SchemaLike<Output, Input>
+): Schema<Output, Input>;
+export function strict<Output, Input extends Record<string, unknown>>(
+  schema: SchemaLike<Output, Input>
+): Schema<Output, Input>;
+export function deepStrict<Output, Input extends Record<string, unknown>>(
+  schema: SchemaLike<Output, Input>
+): Schema<Output, Input>;
+
+// Bare Flatten, not ResolveObject: re-splitting the merged intersection to
+// hoist optionals last nearly doubled this type's instantiation cost, so Merge
+// keeps insertion order.
+type Merge<A, B> = Flatten<
+  { [K in keyof A as K extends keyof B ? never : K]: A[K] } & B
+>;
+
+export function merge<
+  O1 extends Record<string, unknown>,
+  I1,
+  O2 extends Record<string, unknown>,
+  I2
+>(schema1: SchemaLike<O1, I1>, schema2: SchemaLike<O2, I2>): Schema<
+  Merge<O1, O2>,
+  Merge<I1, I2>
+>;
+
+export function recursive<Output, Input = unknown>(
+  identifier: string,
+  definer: (schema: Schema<Output, Input>) => Schema<Output, Input>
+): Schema<Output, Input>;
+
+export type SchemaErrorMessage = {
+  /** Catch-all override, used when no more specific key below matches the failing check. */
+  _?: string;
+  format?: string;
+  type?: string;
+  minimum?: string;
+  maximum?: string;
+  minLength?: string;
+  maxLength?: string;
+  minItems?: string;
+  maxItems?: string;
+  pattern?: string;
+};
+
+export type Meta<Output> = {
+  name?: string;
+  title?: string;
+  description?: string;
+  deprecated?: boolean;
+  examples?: Output[];
+  errorMessage?: SchemaErrorMessage;
+};
+
+export function meta<Output, Input>(
+  schema: SchemaLike<Output, Input>,
+  meta: Meta<Output>
+): Schema<Output, Input>;
+
+export function toExpression(schema: SchemaLike<unknown, unknown>): string;
+export function noValidation<Output, Input>(
+  schema: SchemaLike<Output, Input>,
+  value: boolean
+): Schema<Output, Input>;
+
+export function asyncDecoderAssert<Output, Input>(
+  schema: SchemaLike<Output, Input>,
+  assertFn: (value: Output) => Promise<void>
+): Schema<Output, Input>;
+
+export function refine<Output, Input>(
+  schema: SchemaLike<Output, Input>,
+  refineCheck: (value: Output) => boolean,
+  refineOptions?: {
+    error?: string;
+    path?: string[];
+  }
+): Schema<Output, Input>;
+
+export const min: <Output extends string | number | unknown[], Input>(
+  schema: SchemaLike<Output, Input>,
+  length: number,
+  message?: string
+) => Schema<Output, Input>;
+export const max: <Output extends string | number | unknown[], Input>(
+  schema: SchemaLike<Output, Input>,
+  length: number,
+  message?: string
+) => Schema<Output, Input>;
+export const length: <Output extends string | unknown[], Input>(
+  schema: SchemaLike<Output, Input>,
+  length: number,
+  message?: string
+) => Schema<Output, Input>;
+
+export const pattern: <Input>(
+  schema: SchemaLike<string, Input>,
+  re: RegExp,
+  message?: string
+) => Schema<string, Input>;
+export const trim: <Input>(
+  schema: SchemaLike<string, Input>
+) => Schema<string, Input>;
+
+export type AdditionalItemsMode = "strip" | "strict";
+
+export type GlobalConfigOverride = {
+  defaultAdditionalItems?: AdditionalItemsMode;
+  disableNanNumberValidation?: boolean;
+};
+
+export function global(globalConfigOverride: GlobalConfigOverride): void;
+
+export function shape<Shape = unknown, Output = unknown, Input = unknown>(
+  schema: SchemaLike<Output, Input>,
+  shaper: (value: Output) => Shape
+): Schema<Shape, Input>;
+
+export function to<
+  Output = unknown,
+  Input = unknown,
+  TargetInput = unknown,
+  TargetOutput = unknown
+>(
+  schema: SchemaLike<Output, Input>,
+  target: SchemaLike<TargetOutput, TargetInput>,
+  decode?: ((value: Output) => TargetInput) | undefined,
+  encode?: (value: TargetOutput) => Output
+): Schema<TargetOutput, Input>;
+
+export function toJSONSchema<Output, Input>(
+  schema: SchemaLike<Output, Input>,
+  options?: {
+    target?: "draft-07" | "draft-2020-12" | "openapi-3.0";
+  }
+): JSONSchema7;
+export function fromJSONSchema<Output extends JSON>(
+  jsonSchema: JSONSchema7
+): Schema<Output, JSON>;
+export function extendJSONSchema<Output, Input>(
+  schema: SchemaLike<Output, Input>,
+  jsonSchema: JSONSchema7
+): Schema<Output, Input>;
+/** Enables `~standard.jsonSchema`; its input/output throw before this is called. */
+export function enableStandardJSONSchema(): void;
+
+// ==================================================================================================
+// JSON Schema Draft 07
+// ==================================================================================================
+// https://tools.ietf.org/html/draft-handrews-json-schema-validation-01
+// --------------------------------------------------------------------------------------------------
+
+/**
+ * Primitive type
+ * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.1.1
+ */
+export type JSONSchema7TypeName =
+  | "string" //
+  | "number"
+  | "integer"
+  | "boolean"
+  | "object"
+  | "array"
+  | "null";
+
+/**
+ * Primitive type
+ * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.1.1
+ */
+export type JSONSchema7Type =
+  | string //
+  | number
+  | boolean
+  | JSONSchema7Object
+  | JSONSchema7Array
+  | null;
+
+// Workaround for infinite type recursion
+export interface JSONSchema7Object {
+  [key: string]: JSONSchema7Type;
+}
+
+// Workaround for infinite type recursion
+// https://github.com/Microsoft/TypeScript/issues/3496#issuecomment-128553540
+export interface JSONSchema7Array extends Array<JSONSchema7Type> {}
+
+/**
+ * Meta schema
+ *
+ * Recommended values:
+ * - 'http://json-schema.org/schema#'
+ * - 'http://json-schema.org/hyper-schema#'
+ * - 'http://json-schema.org/draft-07/schema#'
+ * - 'http://json-schema.org/draft-07/hyper-schema#'
+ *
+ * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-5
+ */
+export type JSONSchema7Version = string;
+
+/**
+ * JSON Schema v7
+ * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01
+ */
+export type JSONSchema7Definition = JSONSchema7 | boolean;
+export interface JSONSchema7 {
+  $id?: string | undefined;
+  $ref?: string | undefined;
+  $schema?: JSONSchema7Version | undefined;
+  $comment?: string | undefined;
+
+  /**
+   * @see https://datatracker.ietf.org/doc/html/draft-bhutton-json-schema-00#section-8.2.4
+   * @see https://datatracker.ietf.org/doc/html/draft-bhutton-json-schema-validation-00#appendix-A
+   */
+  $defs?:
+    | {
+        [key: string]: JSONSchema7Definition;
+      }
+    | undefined;
+
+  /**
+   * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.1
+   */
+  type?: JSONSchema7TypeName | JSONSchema7TypeName[] | undefined;
+  enum?: JSONSchema7Type[] | undefined;
+  const?: JSONSchema7Type | undefined;
+
+  /**
+   * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.2
+   */
+  multipleOf?: number | undefined;
+  maximum?: number | undefined;
+  exclusiveMaximum?: number | undefined;
+  minimum?: number | undefined;
+  exclusiveMinimum?: number | undefined;
+
+  /**
+   * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.3
+   */
+  maxLength?: number | undefined;
+  minLength?: number | undefined;
+  pattern?: string | undefined;
+
+  /**
+   * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.4
+   */
+  items?: JSONSchema7Definition | JSONSchema7Definition[] | undefined;
+  prefixItems?: JSONSchema7Definition[] | undefined;
+  additionalItems?: JSONSchema7Definition | undefined;
+  maxItems?: number | undefined;
+  minItems?: number | undefined;
+  uniqueItems?: boolean | undefined;
+  contains?: JSONSchema7Definition | undefined;
+
+  /**
+   * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.5
+   */
+  maxProperties?: number | undefined;
+  minProperties?: number | undefined;
+  required?: string[] | undefined;
+  properties?:
+    | {
+        [key: string]: JSONSchema7Definition;
+      }
+    | undefined;
+  patternProperties?:
+    | {
+        [key: string]: JSONSchema7Definition;
+      }
+    | undefined;
+  additionalProperties?: JSONSchema7Definition | undefined;
+  dependencies?:
+    | {
+        [key: string]: JSONSchema7Definition | string[];
+      }
+    | undefined;
+  propertyNames?: JSONSchema7Definition | undefined;
+
+  /**
+   * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.6
+   */
+  if?: JSONSchema7Definition | undefined;
+  then?: JSONSchema7Definition | undefined;
+  else?: JSONSchema7Definition | undefined;
+
+  /**
+   * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.7
+   */
+  allOf?: JSONSchema7Definition[] | undefined;
+  anyOf?: JSONSchema7Definition[] | undefined;
+  oneOf?: JSONSchema7Definition[] | undefined;
+  not?: JSONSchema7Definition | undefined;
+
+  /**
+   * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-7
+   */
+  format?: string | undefined;
+
+  /**
+   * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-8
+   */
+  contentMediaType?: string | undefined;
+  contentEncoding?: string | undefined;
+
+  /**
+   * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-9
+   */
+  definitions?:
+    | {
+        [key: string]: JSONSchema7Definition;
+      }
+    | undefined;
+
+  /**
+   * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-10
+   */
+  title?: string | undefined;
+  description?: string | undefined;
+  default?: JSONSchema7Type | undefined;
+  readOnly?: boolean | undefined;
+  writeOnly?: boolean | undefined;
+  examples?: JSONSchema7Type | undefined;
+}
