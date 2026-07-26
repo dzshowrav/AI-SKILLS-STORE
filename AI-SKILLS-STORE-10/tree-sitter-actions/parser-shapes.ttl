@@ -1,0 +1,173 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix parser: <https://vocab.clearhead.io/parser#> .
+@prefix actions: <https://clearhead.us/vocab/actions/v3#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+#################################################################
+#    Parser-Specific SHACL Shapes
+#
+#    This file defines syntax validation constraints for the
+#    tree-sitter parser. These are implementation details,
+#    separate from the domain validation in actions-shapes-v3.ttl
+#################################################################
+
+#################################################################
+#    Date/Time Pattern Shapes (Parser Syntax)
+#################################################################
+
+# ISO 8601 Date Pattern Shape
+parser:ISODatePatternShape
+    a sh:NodeShape ;
+    rdfs:label "ISO Date Pattern" ;
+    rdfs:comment "Parser pattern for ISO 8601 dates: YYYY-MM-DD" ;
+    sh:property [
+        sh:path parser:pattern ;
+        sh:hasValue "\\d{4}-\\d{2}-\\d{2}" ;
+    ] ;
+    parser:grammarRuleName "iso_date" ;
+    parser:ruleType "pattern" .
+
+# ISO 8601 Time Pattern Shape
+parser:ISOTimePatternShape
+    a sh:NodeShape ;
+    rdfs:label "ISO Time Pattern" ;
+    rdfs:comment "Parser pattern for ISO 8601 time: HH:MM (24-hour)" ;
+    sh:property [
+        sh:path parser:pattern ;
+        sh:hasValue "\\d{2}:\\d{2}" ;
+    ] ;
+    parser:grammarRuleName "iso_time" ;
+    parser:ruleType "pattern" .
+
+# ISO 8601 DateTime Pattern Shape
+parser:ISODateTimePatternShape
+    a sh:NodeShape ;
+    rdfs:label "ISO DateTime Pattern" ;
+    rdfs:comment "Parser pattern for ISO 8601 datetime: YYYY-MM-DDTHH:MM" ;
+    sh:property [
+        sh:path parser:pattern ;
+        sh:hasValue "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}" ;
+    ] ;
+    parser:grammarRuleName "iso_date_time" ;
+    parser:ruleType "pattern" .
+
+#################################################################
+#    Text Pattern Shapes
+#################################################################
+
+# Safe Text Pattern Shape
+parser:SafeTextPatternShape
+    a sh:NodeShape ;
+    rdfs:label "Safe Text Pattern" ;
+    rdfs:comment "Text that excludes all property symbols and special characters" ;
+    sh:property [
+        sh:path parser:exclude ;
+        sh:hasValue "\\$!*+@%>#\\(\\)\\n\\s" ;
+    ] ;
+    parser:grammarRuleName "safe_text" ;
+    parser:ruleType "computed" ;
+    parser:computedFrom "property_symbols" ;
+    parser:repeatMode "repeat1" .
+
+#################################################################
+#    Depth Constraint Shape
+#################################################################
+
+# Action Depth Constraint (Parser)
+parser:ActionDepthShape
+    a sh:NodeShape ;
+    rdfs:label "Action Depth Constraint" ;
+    rdfs:comment "Maximum nesting depth for child actions (0-5)" ;
+    sh:property [
+        sh:path actions:hasDepth ;
+        sh:minInclusive 0 ;
+        sh:maxInclusive 5 ;
+        sh:datatype xsd:integer ;
+        sh:message "Actions can nest up to 5 levels deep (depth 0-5)" ;
+    ] ;
+    parser:minDepth 1 ;  # Parser depth markers start at 1 (>)
+    parser:maxDepth 5 ;  # Maximum 5 markers (>>>>>)
+    parser:depthSymbol ">" ;
+    parser:grammarRuleName "depth" .
+
+#################################################################
+#    Grammar Metadata Shape
+#################################################################
+
+# Grammar Configuration
+parser:GrammarMetadataShape
+    a sh:NodeShape ;
+    rdfs:label "Grammar Metadata" ;
+    rdfs:comment "Tree-sitter grammar configuration" ;
+    parser:entryPoint "action_list" ;
+    parser:rootRule "root_action" ;
+    parser:repeatMode "repeat" ;
+    parser:whitespaceHandling "extras" ;
+    parser:conflictRules "child_action" .
+
+#################################################################
+#    Context Pattern Shape
+#################################################################
+
+# Context List Pattern
+parser:ContextListPatternShape
+    a sh:NodeShape ;
+    rdfs:label "Context List Pattern" ;
+    rdfs:comment "Comma-separated list of context names without @ prefix" ;
+    sh:targetClass actions:ActionContext ;
+    sh:property [
+        sh:path parser:pattern ;
+        sh:hasValue "[a-zA-Z0-9_-]+(,[a-zA-Z0-9_-]+)*" ;
+        sh:message "Context should be comma-separated names: +office,computer,phone" ;
+    ] ;
+    parser:grammarRuleName "context_list" ;
+    parser:ruleType "pattern" .
+
+#################################################################
+#    Duration Pattern Shape
+#################################################################
+
+# Duration Minutes Pattern
+parser:DurationPatternShape
+    a sh:NodeShape ;
+    rdfs:label "Duration Pattern" ;
+    rdfs:comment "Duration in minutes with D prefix" ;
+    sh:property [
+        sh:path actions:hasDurationMinutes ;
+        sh:minInclusive 1 ;
+        sh:maxInclusive 10080 ;  # 1 week in minutes
+        sh:datatype xsd:integer ;
+        sh:message "Duration must be 1-10080 minutes (1 minute to 1 week)" ;
+    ] ;
+    parser:symbol "D" ;
+    parser:grammarRuleName "duration" ;
+    parser:ruleType "integer" .
+
+#################################################################
+#    Composition Shapes (How properties nest/combine)
+#################################################################
+
+# Do Date/Time with Optional Duration
+parser:DoDateTimeCompositionShape
+    a sh:NodeShape ;
+    rdfs:label "Do Date/Time Composition" ;
+    rdfs:comment "Duration can optionally follow do_date_or_time" ;
+    sh:targetClass actions:ActionPlan ;
+    sh:property [
+        sh:path actions:hasDoDateTime ;
+        sh:class actions:DateTimeValue ;
+        sh:order 1 ;
+    ] ;
+    sh:property [
+        sh:path actions:hasDurationMinutes ;
+        sh:minCount 0 ;
+        sh:maxCount 1 ;
+        sh:order 2 ;
+        sh:message "Duration is optional and follows the date/time if present" ;
+    ] ;
+    parser:compositionRule "do_date_or_time" ;
+    parser:childRule "duration" ;
+    parser:childOptional "true" .
+

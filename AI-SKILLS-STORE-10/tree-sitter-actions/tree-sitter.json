@@ -1,0 +1,39 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
+  "grammars": [
+    {
+      "name": "actions",
+      "camelcase": "Actions",
+      "title": "ClearHead Actions",
+      "scope": "source.actions",
+      "file-types": [
+        "actions"
+      ],
+      "injection-regex": "^actions$",
+      "class-name": "TreeSitterActions"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "parser for the actions file as defined by the specification therein",
+    "authors": [
+      {
+        "name": "Darrion Burgess",
+        "email": "darrionburgess@gmail.com"
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/ClearHeadToDo-Devs/tree-sitter-actions"
+    }
+  },
+  "bindings": {
+    "c": true,
+    "go": true,
+    "node": true,
+    "python": true,
+    "rust": true,
+    "swift": true,
+    "zig": false
+  }
+}

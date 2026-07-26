@@ -1,0 +1,5 @@
+docs/*.md
+grammar.js
+test/cropus/*.txt
+queries/actions/*.scm
+ftdetect/actions.fnl

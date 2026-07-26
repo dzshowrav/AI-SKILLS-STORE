@@ -1,0 +1,383 @@
+@prefix actions: <https://clearhead.us/vocab/actions/v3#> .
+@prefix parser: <https://vocab.clearhead.io/parser#> .
+@prefix schema: <http://schema.org/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+#################################################################
+# Parser Extension Ontology for Actions Vocabulary
+#################################################################
+#
+# This ontology extends the Actions Vocabulary v3 with syntax-specific
+# metadata needed for tree-sitter parser generation.
+#
+# It defines:
+# - Symbols that introduce properties in file syntax (!, +, @, etc.)
+# - Grammar rule names and types
+# - Value mappings between ontology and syntax
+# - Special syntax patterns (brackets, depth markers, lists)
+#
+# This enables automatic generation of:
+# - syntax_mapping.json (intermediate format)
+# - grammar.js (tree-sitter grammar)
+# - parser.c (compiled parser)
+#
+#################################################################
+
+<https://vocab.clearhead.io/parser> a owl:Ontology ;
+    rdfs:label "Actions Parser Extension Ontology" ;
+    rdfs:comment "Extends Actions Vocabulary v3 with syntax metadata for parser generation" ;
+    owl:versionInfo "1.0.0" ;
+    # Import V3 ontology from production
+    owl:imports <https://clearhead.us/vocab/actions/v3> ;
+    # Note: SHACL shapes loaded separately (actions-shapes-v3.ttl)
+    # For local development, generator will load shapes from ../ontology/actions-shapes-v3.ttl
+    rdfs:seeAlso <https://clearhead.us/vocab/actions/v3/shapes.ttl> .
+
+#################################################################
+# Parser Vocabulary (New Classes & Properties)
+#################################################################
+
+# Syntax pattern classes
+parser:SyntaxPattern a owl:Class ;
+    rdfs:label "Syntax Pattern" ;
+    rdfs:comment "A pattern for representing properties in file syntax" .
+
+parser:ParenthesisSyntax a owl:Class ;
+    rdfs:subClassOf parser:SyntaxPattern ;
+    rdfs:label "Parenthesis Syntax" ;
+    rdfs:comment "Syntax pattern using parentheses to enclose values, e.g., (x) for state" .
+
+parser:DepthMarker a owl:Class ;
+    rdfs:subClassOf parser:SyntaxPattern ;
+    rdfs:label "Depth Marker" ;
+    rdfs:comment "Syntax pattern using repeated > symbols for hierarchical depth" .
+
+parser:ListSyntax a owl:Class ;
+    rdfs:subClassOf parser:SyntaxPattern ;
+    rdfs:label "List Syntax" ;
+    rdfs:comment "Comma-separated list of values" .
+
+# Annotation properties
+parser:symbol a owl:AnnotationProperty ;
+    rdfs:label "syntax symbol" ;
+    rdfs:comment "Character(s) that introduce a property in file syntax" ;
+    rdfs:range xsd:string .
+
+parser:grammarRuleName a owl:AnnotationProperty ;
+    rdfs:label "grammar rule name" ;
+    rdfs:comment "Name of the tree-sitter grammar rule for this property" ;
+    rdfs:range xsd:string .
+
+parser:ruleType a owl:AnnotationProperty ;
+    rdfs:label "rule type" ;
+    rdfs:comment "Type of grammar rule: choice, pattern, uuid_v7, date_time, integer, text, reference" ;
+    rdfs:range xsd:string .
+
+parser:contextLevel a owl:AnnotationProperty ;
+    rdfs:label "context level" ;
+    rdfs:comment "Where in hierarchy this property appears: root_only, child_only, any_level" ;
+    rdfs:range xsd:string .
+
+parser:formatHint a owl:AnnotationProperty ;
+    rdfs:label "format hint" ;
+    rdfs:comment "Human-readable formatting guidance for this property" ;
+    rdfs:range xsd:string .
+
+parser:example a owl:AnnotationProperty ;
+    rdfs:label "syntax example" ;
+    rdfs:comment "Example usage in file syntax" ;
+    rdfs:range xsd:string .
+
+parser:canRepeat a owl:AnnotationProperty ;
+    rdfs:label "can repeat" ;
+    rdfs:comment "Whether property can appear multiple times in syntax" ;
+    rdfs:range xsd:boolean .
+
+parser:isComputed a owl:AnnotationProperty ;
+    rdfs:label "is computed" ;
+    rdfs:comment "Whether property is calculated, not directly represented in syntax" ;
+    rdfs:range xsd:boolean .
+
+parser:usesSyntax a owl:AnnotationProperty ;
+    rdfs:label "uses syntax" ;
+    rdfs:comment "Links property to a special syntax pattern class" ;
+    rdfs:range parser:SyntaxPattern .
+
+# Value mapping properties
+parser:ontologyValue a owl:DatatypeProperty ;
+    rdfs:label "ontology value" ;
+    rdfs:comment "Value as represented in the ontology/RDF" ;
+    rdfs:range xsd:string .
+
+parser:syntaxValue a owl:DatatypeProperty ;
+    rdfs:label "syntax value" ;
+    rdfs:comment "Value as represented in file syntax" ;
+    rdfs:range xsd:string .
+
+    parser:parenSymbol a owl:DatatypeProperty ;
+    rdfs:label "parenthesis symbol" ;
+    rdfs:comment "Character used inside parentheses for state representation" ;
+    rdfs:range xsd:string .
+
+# Structural properties for grammar definition
+parser:ActionGrammarStructure a owl:Class ;
+    rdfs:label "Action Grammar Structure" ;
+    rdfs:comment "Defines the ordered sequence of properties for a specific action type in the grammar." .
+
+parser:RootActionGrammarStructure a owl:Class ;
+    rdfs:subClassOf parser:ActionGrammarStructure ;
+    rdfs:label "Root Action Grammar Structure" ;
+    rdfs:comment "Defines the grammar structure for a root-level action." ;
+    parser:hasOrderedProperty (
+        [ parser:grammarRuleName "state" ; parser:isRequired "true"^^xsd:boolean ]
+        [ parser:grammarRuleName "name" ; parser:isRequired "true"^^xsd:boolean ]
+        [ parser:grammarRuleName "description" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "priority" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "project" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "context" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "do_date_or_time" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "completed_date" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "duration" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "recurrence" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "recurrence_interval" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "recurrence_count" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "recurrence_until" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "id" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "children" ; parser:isRequired "false"^^xsd:boolean ; rdfs:comment "Special rule for nested child actions" ]
+    ) .
+
+parser:ChildActionGrammarStructure a owl:Class ;
+    rdfs:subClassOf parser:ActionGrammarStructure ;
+    rdfs:label "Child Action Grammar Structure" ;
+    rdfs:comment "Defines the grammar structure for a child-level action." ;
+    parser:hasOrderedProperty (
+        [ parser:grammarRuleName "depth" ; parser:isRequired "true"^^xsd:boolean ]
+        [ parser:grammarRuleName "state" ; parser:isRequired "true"^^xsd:boolean ]
+        [ parser:grammarRuleName "name" ; parser:isRequired "true"^^xsd:boolean ]
+        [ parser:grammarRuleName "description" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "priority" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "context" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "do_date_or_time" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "completed_date" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "duration" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "recurrence" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "recurrence_interval" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "recurrence_count" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "recurrence_until" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "id" ; parser:isRequired "false"^^xsd:boolean ]
+        [ parser:grammarRuleName "children" ; parser:isRequired "false"^^xsd:boolean ; rdfs:comment "Special rule for nested child actions" ]
+    ) .
+
+parser:hasOrderedProperty a owl:ObjectProperty ;
+    rdfs:label "has ordered property" ;
+    rdfs:comment "Links an action grammar structure to an ordered list of properties it contains." ;
+    rdfs:range rdf:List .
+
+parser:isRequired a owl:DatatypeProperty ;
+    rdfs:label "is required" ;
+    rdfs:comment "Indicates if a property is required in the grammar structure definition." ;
+    rdfs:range xsd:boolean .
+#################################################################
+# Property Annotations - IDENTIFICATION
+#################################################################
+
+actions:hasUUID
+    parser:symbol "#" ;
+    parser:grammarRuleName "id" ;
+    parser:ruleType "uuid_v7" ;
+    parser:contextLevel "any_level" ;
+    parser:formatHint "Version 7 UUID with optional dashes" ;
+    parser:example "#01951111-cfa6-718d-b303-d7107f4005b3" .
+
+schema:name
+    parser:symbol "" ;
+    parser:grammarRuleName "name" ;
+    parser:ruleType "text" ;
+    parser:contextLevel "any_level" ;
+    parser:formatHint "Free text, escape special chars with backslash" ;
+    parser:example "Review quarterly reports" .
+
+#################################################################
+# Property Annotations - CORE PROPERTIES
+#################################################################
+
+actions:hasPriority
+    parser:symbol "!" ;
+    parser:grammarRuleName "priority" ;
+    parser:ruleType "choice" ;
+    parser:contextLevel "any_level" ;
+    parser:formatHint "Eisenhower matrix: 1=urgent+important, 4=neither" ;
+    parser:example "!2" .
+
+actions:hasState
+    parser:symbol "" ;
+    parser:grammarRuleName "state" ;
+    parser:ruleType "choice" ;
+    parser:contextLevel "any_level" ;
+    parser:usesSyntax parser:ParenthesisSyntax ;
+    parser:formatHint "( )=not started, (x)=completed, (-)=in progress, (=)=blocked, (_)=cancelled" ;
+    parser:example "(x)" .
+
+# State-to-parenthesis mappings
+actions:NotStarted parser:parenSymbol " " .
+actions:Completed parser:parenSymbol "x" .
+actions:InProgress parser:parenSymbol "-" .
+actions:Blocked parser:parenSymbol "=" .
+actions:Cancelled parser:parenSymbol "_" .
+
+# Context property - uses deprecated string property in V3
+# Note: In V3, there's actions:hasContext (deprecated string) and actions:requiresContext (new typed)
+# The file format still uses the simple string version
+actions:hasContext
+    parser:symbol "+" ;
+    parser:grammarRuleName "context" ;
+    parser:ruleType "pattern" ;
+    parser:contextLevel "any_level" ;
+    parser:usesSyntax parser:ListSyntax ;
+    parser:canRepeat "true"^^xsd:boolean ;
+    parser:formatHint "GTD contexts: +office,computer,phone" ;
+    parser:example "+Driving,Store,Market" ;
+    rdfs:comment "Pattern matches comma-separated list of context names" .
+
+schema:description
+    parser:symbol "$" ;
+    parser:grammarRuleName "description" ;
+    parser:ruleType "text" ;
+    parser:contextLevel "any_level" ;
+    parser:formatHint "Extended description text" ;
+    parser:example "$ Make sure you get the stuff from the butcher directly" .
+
+#################################################################
+# Property Annotations - HIERARCHICAL
+#################################################################
+
+actions:hasProject
+    parser:symbol "*" ;
+    parser:grammarRuleName "project" ;
+    parser:ruleType "text" ;
+    parser:contextLevel "root_only" ;
+    parser:formatHint "Project/story name for root actions only" ;
+    parser:example "*Run Errands" .
+
+actions:hasParentPlan
+    parser:symbol ">" ;
+    parser:grammarRuleName "depth" ;
+    parser:ruleType "reference" ;
+    parser:contextLevel "child_only" ;
+    parser:usesSyntax parser:DepthMarker ;
+    parser:formatHint "Hierarchical depth: > child, >> grandchild, etc." ;
+    parser:example "> Child action" .
+
+actions:hasDepth
+    parser:symbol "" ;
+    parser:grammarRuleName "calculated_depth" ;
+    parser:ruleType "integer" ;
+    parser:contextLevel "any_level" ;
+    parser:isComputed "true"^^xsd:boolean ;
+    parser:formatHint "Auto-calculated from nesting level (0-5)" .
+
+#################################################################
+# Property Annotations - SCHEDULING
+#################################################################
+
+actions:hasDoDateTime
+    parser:symbol "@" ;
+    parser:grammarRuleName "do_date_or_time" ;
+    parser:ruleType "date_time" ;
+    parser:contextLevel "any_level" ;
+    parser:formatHint "ISO 8601: @2025-01-20T14:30 or @2025-01-20 or @14:30" ;
+    parser:example "@2025-01-20T14:30" .
+
+actions:hasCompletedDateTime
+    parser:symbol "%" ;
+    parser:grammarRuleName "completed_date" ;
+    parser:ruleType "date_time" ;
+    parser:contextLevel "any_level" ;
+    parser:formatHint "Auto-generated completion timestamp" ;
+    parser:example "%2025-01-19T10:30" .
+
+actions:hasDurationMinutes
+    parser:symbol "D" ;
+    parser:grammarRuleName "duration" ;
+    parser:ruleType "integer" ;
+    parser:contextLevel "any_level" ;
+    parser:formatHint "Duration in minutes: D90" ;
+    parser:example "D30" .
+
+#################################################################
+# Property Annotations - RECURRENCE
+#################################################################
+
+actions:hasRecurrenceFrequency
+    parser:symbol "R" ;
+    parser:grammarRuleName "recurrence" ;
+    parser:ruleType "choice" ;
+    parser:contextLevel "any_level" ;
+    parser:formatHint "Recurrence: RD=daily, RW=weekly, RM=monthly, RY=yearly" ;
+    parser:example "RW" ;
+    # Value mappings: ontology value -> syntax value
+    rdfs:comment """Value mappings:
+        DAILY -> D
+        WEEKLY -> W
+        MONTHLY -> M
+        YEARLY -> Y""" .
+
+# Define value mappings as blank nodes
+actions:hasRecurrenceFrequency parser:valueMapping
+    _:dailyMapping, _:weeklyMapping, _:monthlyMapping, _:yearlyMapping .
+
+_:dailyMapping
+    parser:ontologyValue "DAILY" ;
+    parser:syntaxValue "D" .
+
+_:weeklyMapping
+    parser:ontologyValue "WEEKLY" ;
+    parser:syntaxValue "W" .
+
+_:monthlyMapping
+    parser:ontologyValue "MONTHLY" ;
+    parser:syntaxValue "M" .
+
+_:yearlyMapping
+    parser:ontologyValue "YEARLY" ;
+    parser:syntaxValue "Y" .
+
+actions:hasRecurrenceInterval
+    parser:symbol "I" ;
+    parser:grammarRuleName "recurrence_interval" ;
+    parser:ruleType "integer" ;
+    parser:contextLevel "any_level" ;
+    parser:formatHint "Recurrence interval: I2 = every 2nd occurrence" ;
+    parser:example "I2" .
+
+actions:hasRecurrenceCount
+    parser:symbol "C" ;
+    parser:grammarRuleName "recurrence_count" ;
+    parser:ruleType "integer" ;
+    parser:contextLevel "any_level" ;
+    parser:formatHint "Max recurrence count: C10" ;
+    parser:example "C10" .
+
+actions:hasRecurrenceUntil
+    parser:symbol "U" ;
+    parser:grammarRuleName "recurrence_until" ;
+    parser:ruleType "date_time" ;
+    parser:contextLevel "any_level" ;
+    parser:formatHint "Recurrence end date: U2025-12-31" ;
+    parser:example "U2025-12-31" .
+
+#################################################################
+# Additional Metadata
+#
+# NOTE: Parser-specific patterns (iso_date, safe_text, depth, etc.)
+# have been moved to parser-shapes.ttl for better separation of concerns.
+# The ontology focuses on semantic mappings; SHACL shapes handle validation.
+#################################################################
+
+# Document which properties are required in syntax
+schema:name rdfs:comment "REQUIRED: Every action must have a name" .
+actions:hasState rdfs:comment "REQUIRED: Every action must have a state" .

@@ -1,0 +1,41 @@
+{
+  "actions": {
+    "with_everything": "With Everything",
+    "conformance_test": "Conformance Test"
+  },
+  "properties": {
+    "with_description": "With Description",
+    "with_priority": "With Priority",
+    "with_story": "With Story",
+    "with_context": "With Context",
+    "with_id_no_dash": "With Id no dash",
+    "with_id_with_dash": "With Id with dash",
+    "with_links": "With Links"
+  },
+  "dates": {
+    "with_do_date": "With do-date",
+    "with_completed_date": "with completed date",
+    "with_recurring_daily_do_date": "with recurring daily do-date",
+    "with_recurring_weekly_do_date": "with recurring weekly do-date"
+  },
+  "children": {
+    "minimal": "Basic Root Action",
+    "with_children": "With Children",
+    "with_children_and_second_root": "Children Followed by Root Action"
+  },
+  "predecessors": {
+    "laundry_workflow": "Sequential Laundry Workflow",
+    "deployment_workflow": "Multi-step Deployment with Dependencies",
+    "multiple_dependencies": "Multiple Dependencies Workflow"
+  },
+  "linting": {
+    "linting_e003": "Empty context tag edge cases"
+  },
+  "new_features": {
+    "with_alias": "With Alias",
+    "with_sequential": "With Sequential Children Marker",
+    "with_short_uuid": "With Short UUID References",
+    "with_story_path": "With Hierarchical Story Paths",
+    "with_new_features": "With All New Features Combined"
+  }
+}

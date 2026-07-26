@@ -1,0 +1,1270 @@
+[
+  {
+    "type": "alias",
+    "named": true,
+    "fields": {
+      "icon": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "=",
+            "named": false
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "alias_name",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "completed_date",
+    "named": true,
+    "fields": {
+      "datetime": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "datetime",
+            "named": true
+          }
+        ]
+      },
+      "icon": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "%",
+            "named": false
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "context",
+    "named": true,
+    "fields": {
+      "icon": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "+",
+            "named": false
+          }
+        ]
+      },
+      "item": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "tag",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "created_date",
+    "named": true,
+    "fields": {
+      "datetime": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "datetime",
+            "named": true
+          }
+        ]
+      },
+      "icon": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "^",
+            "named": false
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "depth1_action",
+    "named": true,
+    "fields": {
+      "child": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "depth2_action",
+            "named": true
+          }
+        ]
+      },
+      "marker": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "depth1_marker",
+            "named": true
+          }
+        ]
+      },
+      "metadata": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "alias",
+            "named": true
+          },
+          {
+            "type": "completed_date",
+            "named": true
+          },
+          {
+            "type": "context",
+            "named": true
+          },
+          {
+            "type": "created_date",
+            "named": true
+          },
+          {
+            "type": "description",
+            "named": true
+          },
+          {
+            "type": "do_date",
+            "named": true
+          },
+          {
+            "type": "due_date",
+            "named": true
+          },
+          {
+            "type": "id",
+            "named": true
+          },
+          {
+            "type": "predecessor",
+            "named": true
+          },
+          {
+            "type": "priority",
+            "named": true
+          },
+          {
+            "type": "sequential",
+            "named": true
+          },
+          {
+            "type": "story",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "name",
+            "named": true
+          }
+        ]
+      },
+      "state": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "state",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "depth2_action",
+    "named": true,
+    "fields": {
+      "child": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "depth3_action",
+            "named": true
+          }
+        ]
+      },
+      "marker": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "depth2_marker",
+            "named": true
+          }
+        ]
+      },
+      "metadata": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "alias",
+            "named": true
+          },
+          {
+            "type": "completed_date",
+            "named": true
+          },
+          {
+            "type": "context",
+            "named": true
+          },
+          {
+            "type": "created_date",
+            "named": true
+          },
+          {
+            "type": "description",
+            "named": true
+          },
+          {
+            "type": "do_date",
+            "named": true
+          },
+          {
+            "type": "due_date",
+            "named": true
+          },
+          {
+            "type": "id",
+            "named": true
+          },
+          {
+            "type": "predecessor",
+            "named": true
+          },
+          {
+            "type": "priority",
+            "named": true
+          },
+          {
+            "type": "sequential",
+            "named": true
+          },
+          {
+            "type": "story",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "name",
+            "named": true
+          }
+        ]
+      },
+      "state": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "state",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "depth3_action",
+    "named": true,
+    "fields": {
+      "child": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "depth4_action",
+            "named": true
+          }
+        ]
+      },
+      "marker": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "depth3_marker",
+            "named": true
+          }
+        ]
+      },
+      "metadata": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "alias",
+            "named": true
+          },
+          {
+            "type": "completed_date",
+            "named": true
+          },
+          {
+            "type": "context",
+            "named": true
+          },
+          {
+            "type": "created_date",
+            "named": true
+          },
+          {
+            "type": "description",
+            "named": true
+          },
+          {
+            "type": "do_date",
+            "named": true
+          },
+          {
+            "type": "due_date",
+            "named": true
+          },
+          {
+            "type": "id",
+            "named": true
+          },
+          {
+            "type": "predecessor",
+            "named": true
+          },
+          {
+            "type": "priority",
+            "named": true
+          },
+          {
+            "type": "sequential",
+            "named": true
+          },
+          {
+            "type": "story",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "name",
+            "named": true
+          }
+        ]
+      },
+      "state": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "state",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "depth4_action",
+    "named": true,
+    "fields": {
+      "child": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "depth5_action",
+            "named": true
+          }
+        ]
+      },
+      "marker": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "depth4_marker",
+            "named": true
+          }
+        ]
+      },
+      "metadata": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "alias",
+            "named": true
+          },
+          {
+            "type": "completed_date",
+            "named": true
+          },
+          {
+            "type": "context",
+            "named": true
+          },
+          {
+            "type": "created_date",
+            "named": true
+          },
+          {
+            "type": "description",
+            "named": true
+          },
+          {
+            "type": "do_date",
+            "named": true
+          },
+          {
+            "type": "due_date",
+            "named": true
+          },
+          {
+            "type": "id",
+            "named": true
+          },
+          {
+            "type": "predecessor",
+            "named": true
+          },
+          {
+            "type": "priority",
+            "named": true
+          },
+          {
+            "type": "sequential",
+            "named": true
+          },
+          {
+            "type": "story",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "name",
+            "named": true
+          }
+        ]
+      },
+      "state": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "state",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "depth5_action",
+    "named": true,
+    "fields": {
+      "marker": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "depth5_marker",
+            "named": true
+          }
+        ]
+      },
+      "metadata": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "alias",
+            "named": true
+          },
+          {
+            "type": "completed_date",
+            "named": true
+          },
+          {
+            "type": "context",
+            "named": true
+          },
+          {
+            "type": "created_date",
+            "named": true
+          },
+          {
+            "type": "description",
+            "named": true
+          },
+          {
+            "type": "do_date",
+            "named": true
+          },
+          {
+            "type": "due_date",
+            "named": true
+          },
+          {
+            "type": "id",
+            "named": true
+          },
+          {
+            "type": "predecessor",
+            "named": true
+          },
+          {
+            "type": "priority",
+            "named": true
+          },
+          {
+            "type": "sequential",
+            "named": true
+          },
+          {
+            "type": "story",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "name",
+            "named": true
+          }
+        ]
+      },
+      "state": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "state",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "description",
+    "named": true,
+    "fields": {
+      "close": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "description_marker",
+            "named": true
+          }
+        ]
+      },
+      "icon": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "description_marker",
+            "named": true
+          }
+        ]
+      },
+      "text": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "description_content",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "description_content",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "description_text_chunk",
+          "named": true
+        },
+        {
+          "type": "link",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "do_date",
+    "named": true,
+    "fields": {
+      "datetime": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "datetime",
+            "named": true
+          }
+        ]
+      },
+      "duration": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "duration",
+            "named": true
+          }
+        ]
+      },
+      "icon": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "@",
+            "named": false
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "due_date",
+    "named": true,
+    "fields": {
+      "datetime": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "datetime",
+            "named": true
+          }
+        ]
+      },
+      "duration": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "duration",
+            "named": true
+          }
+        ]
+      },
+      "icon": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": ":",
+            "named": false
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "duration",
+    "named": true,
+    "fields": {
+      "minutes": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "minutes",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "id",
+    "named": true,
+    "fields": {
+      "icon": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "id_hash",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "malformed_id",
+            "named": true
+          },
+          {
+            "type": "uuid_value",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "link",
+    "named": true,
+    "fields": {
+      "text": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "link_text",
+            "named": true
+          }
+        ]
+      },
+      "url": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "link_url",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "link_text",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "link_url",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "minutes",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "name",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "link",
+          "named": true
+        },
+        {
+          "type": "name_text_chunk",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "name_text_chunk",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "predecessor",
+    "named": true,
+    "fields": {
+      "icon": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "<",
+            "named": false
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "predecessor_reference",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "predecessor_name",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "predecessor_reference",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "predecessor_name",
+          "named": true
+        },
+        {
+          "type": "short_uuid_value",
+          "named": true
+        },
+        {
+          "type": "uuid_value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "priority",
+    "named": true,
+    "fields": {
+      "icon": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "!",
+            "named": false
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "priority_level",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "priority_level",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "root_action",
+    "named": true,
+    "fields": {
+      "child": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "depth1_action",
+            "named": true
+          }
+        ]
+      },
+      "metadata": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "alias",
+            "named": true
+          },
+          {
+            "type": "completed_date",
+            "named": true
+          },
+          {
+            "type": "context",
+            "named": true
+          },
+          {
+            "type": "created_date",
+            "named": true
+          },
+          {
+            "type": "description",
+            "named": true
+          },
+          {
+            "type": "do_date",
+            "named": true
+          },
+          {
+            "type": "due_date",
+            "named": true
+          },
+          {
+            "type": "id",
+            "named": true
+          },
+          {
+            "type": "predecessor",
+            "named": true
+          },
+          {
+            "type": "priority",
+            "named": true
+          },
+          {
+            "type": "sequential",
+            "named": true
+          },
+          {
+            "type": "story",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "name",
+            "named": true
+          }
+        ]
+      },
+      "state": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "state",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "sequential",
+    "named": true,
+    "fields": {
+      "icon": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "~",
+            "named": false
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "source_file",
+    "named": true,
+    "root": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "root_action",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "state",
+    "named": true,
+    "fields": {
+      "close": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "state_close",
+            "named": true
+          }
+        ]
+      },
+      "open": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "state_open",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "state_blocked",
+            "named": true
+          },
+          {
+            "type": "state_cancelled",
+            "named": true
+          },
+          {
+            "type": "state_completed",
+            "named": true
+          },
+          {
+            "type": "state_in_progress",
+            "named": true
+          },
+          {
+            "type": "state_not_started",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "state_blocked",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "story",
+    "named": true,
+    "fields": {
+      "icon": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "*",
+            "named": false
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "story_name",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "story_name",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "uuid_value",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "!",
+    "named": false
+  },
+  {
+    "type": "%",
+    "named": false
+  },
+  {
+    "type": "*",
+    "named": false
+  },
+  {
+    "type": "+",
+    "named": false
+  },
+  {
+    "type": ",",
+    "named": false
+  },
+  {
+    "type": ":",
+    "named": false
+  },
+  {
+    "type": "<",
+    "named": false
+  },
+  {
+    "type": "=",
+    "named": false
+  },
+  {
+    "type": "@",
+    "named": false
+  },
+  {
+    "type": "D",
+    "named": false
+  },
+  {
+    "type": "[[",
+    "named": false
+  },
+  {
+    "type": "]]",
+    "named": false
+  },
+  {
+    "type": "^",
+    "named": false
+  },
+  {
+    "type": "alias_name",
+    "named": true
+  },
+  {
+    "type": "datetime",
+    "named": true
+  },
+  {
+    "type": "depth1_marker",
+    "named": true
+  },
+  {
+    "type": "depth2_marker",
+    "named": true
+  },
+  {
+    "type": "depth3_marker",
+    "named": true
+  },
+  {
+    "type": "depth4_marker",
+    "named": true
+  },
+  {
+    "type": "depth5_marker",
+    "named": true
+  },
+  {
+    "type": "description_marker",
+    "named": true
+  },
+  {
+    "type": "description_text_chunk",
+    "named": true
+  },
+  {
+    "type": "id_hash",
+    "named": true
+  },
+  {
+    "type": "malformed_id",
+    "named": true
+  },
+  {
+    "type": "short_uuid_value",
+    "named": true
+  },
+  {
+    "type": "state_cancelled",
+    "named": true
+  },
+  {
+    "type": "state_close",
+    "named": true
+  },
+  {
+    "type": "state_completed",
+    "named": true
+  },
+  {
+    "type": "state_in_progress",
+    "named": true
+  },
+  {
+    "type": "state_not_started",
+    "named": true
+  },
+  {
+    "type": "state_open",
+    "named": true
+  },
+  {
+    "type": "tag",
+    "named": true
+  },
+  {
+    "type": "|",
+    "named": false
+  },
+  {
+    "type": "~",
+    "named": false
+  }
+]

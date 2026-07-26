@@ -1,0 +1,39 @@
+[package]
+name = "tree-sitter-actions"
+description = "parser for the actions file as defined by the specification therein"
+version = "0.9.4"
+authors = ["Darrion Burgess <darrionburgess@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+keywords = ["actions", "incremental", "parsing", "tree-sitter"]
+categories = ["parser-implementations", "parsing", "text-editors"]
+repository = "https://github.com/clearheadtodo-devs/tree-sitter-actions"
+edition = "2021"
+autoexamples = false
+build = "bindings/rust/build.rs"
+include = [
+  "LICENSE",
+  "bindings/rust/*",
+  "examples/*",
+  "grammar.js",
+  "patterns.js",
+  "queries/*",
+  "schema/*",
+  "src/*",
+  "test/test_descriptions.json",
+  "tree-sitter.json"
+]
+
+[lib]
+path = "bindings/rust/lib.rs"
+
+[dependencies]
+tree-sitter-language = "0.1"
+
+[dev-dependencies]
+serde_json = "1.0"
+tree-sitter = "0.25.1"
+
+[build-dependencies]
+cc = "1.2"
+serde_json = "1.0"

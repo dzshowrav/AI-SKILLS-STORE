@@ -1,0 +1,4 @@
+[x] no escape mechanism for literal colon in action names +bug %2026-07-04T23:06 #019e6da7-d1e4-7dd2-bbca-2da7ab9ce2ed
+[x] highlight the due date field $ right now its just white unlike the work we are thinking right now $ +query %2026-07-05T00:25 #019e604b-ef3f-74a2-989f-ddcb5f745b57
+[x] show proper link highlighting $ interestingly enough, we actually see it for a second then i think the highlighting for the description/name takes over or something because it immediately leaves $ !3 +bug,queries,highlights %2026-07-05T00:25 #019f30e4-0c29-76e1-b37f-023ebaad45b2
+[x] add space before and after links $ right now it just smooshes links with the rest of the content after formatting $ !2 +formatter,bug %2026-07-05T10:26 #019f30e3-751e-74b2-8865-771b7ca2aafb
