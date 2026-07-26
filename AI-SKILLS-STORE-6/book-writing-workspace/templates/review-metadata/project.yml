@@ -1,8 +1,0 @@
-aut:
-  - 著者名
-booktitle: "{{BOOK_TITLE}}"
-subtitle: サブタイトル
-pbl: 出版社名
-cover:
-  badge: BOOK
-  strapline: Markdown / Re:VIEW / PDF / Manuscript Workflow
