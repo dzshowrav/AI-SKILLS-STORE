@@ -1,0 +1,235 @@
+# Script Templates
+
+Canonical, fully-annotated examples of the section layout. Copy the shape, not the content. Omit any subsection that would be empty — never leave placeholder headers.
+
+## Server Script
+
+```lua
+--!strict
+
+-- // VARIABLES // --
+
+-- | Services | --
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
+
+-- | Modules | --
+-- Ordered: ServerScriptService -> ServerStorage -> ReplicatedStorage -> Workspace -> script-relative
+local PlayerData = require(ServerStorage.Modules.PlayerData)
+
+-- | Objects | --
+local remotes = ReplicatedStorage:WaitForChild("Remotes")
+local purchaseRemote = remotes:WaitForChild("Purchase") :: RemoteEvent
+
+-- | Configuration | --
+local MAX_PURCHASES_PER_WINDOW = 10
+local PURCHASE_WINDOW = 60
+
+-- | State Management | --
+local purchaseWindows: {[Player]: {count: number, windowStart: number}} = {}
+local playerConnections: {[Player]: {RBXScriptConnection}} = {}
+
+-- // FUNCTIONS // --
+
+--[[
+	Handles a purchase request coming from a client, rejecting anything invalid.
+
+	@param itemId Untrusted client argument; validated before use
+]]
+local function onPurchaseRequest(player: Player, itemId: unknown)
+	if typeof(itemId) ~= "string" then return end
+	local now = os.clock()
+	local window = purchaseWindows[player]
+	if not window or now - window.windowStart > PURCHASE_WINDOW then
+		window = {count = 0, windowStart = now}
+		purchaseWindows[player] = window
+	end
+	if window.count >= MAX_PURCHASES_PER_WINDOW then return end
+	window.count += 1
+	-- ... server-side validation of price/ownership, then grant
+end
+
+--[[
+	Prepares everything a newly joined player needs.
+]]
+local function onPlayerAdded(player: Player)
+	playerConnections[player] = {}
+	PlayerData.Load(player)
+end
+
+--[[
+	Releases everything owned by a leaving player.
+]]
+local function onPlayerRemoving(player: Player)
+	PlayerData.Save(player)
+	for _, connection in playerConnections[player] or {} do
+		connection:Disconnect()
+	end
+	playerConnections[player] = nil
+	purchaseWindows[player] = nil
+end
+
+--[[
+	Finalizes pending state so the server can shut down safely.
+]]
+local function onClose()
+	PlayerData.SaveAll()
+end
+
+-- // INITIALIZATION // --
+
+-- | Player Events | --
+Players.PlayerAdded:Connect(onPlayerAdded)
+Players.PlayerRemoving:Connect(onPlayerRemoving)
+for _, player in Players:GetPlayers() do -- players who joined before this script ran
+	task.spawn(onPlayerAdded, player)
+end
+
+-- | Remotes | --
+purchaseRemote.OnServerEvent:Connect(onPurchaseRequest)
+
+-- | Lifecycle | --
+game:BindToClose(onClose)
+```
+
+## ModuleScript
+
+```lua
+--!strict
+
+-- // VARIABLES // --
+
+-- | Services | --
+local DataStoreService = game:GetService("DataStoreService")
+local Players = game:GetService("Players")
+
+-- | Modules | --
+local DeepCopy = require(script.Parent.DeepCopy)
+
+-- | Configuration | --
+local STORE_NAME = "PlayerData_v1"
+local MAX_RETRIES = 3
+local RETRY_BASE_DELAY = 1
+
+-- | State Management | --
+local store = DataStoreService:GetDataStore(STORE_NAME)
+local sessionCache: {[Player]: {[string]: any}} = {}
+
+local PlayerData = {}
+
+-- // FUNCTIONS // --
+
+-- | Private | --
+
+--[[
+	Runs a fallible operation under this module's retry policy.
+
+	@param fn The operation to attempt; may be retried multiple times
+	@return Whether it eventually succeeded, followed by its results
+]]
+local function withRetry<T...>(fn: () -> T...): (boolean, T...)
+	for attempt = 1, MAX_RETRIES do
+		local results = table.pack(pcall(fn))
+		if results[1] then
+			return table.unpack(results, 1, results.n) :: any
+		end
+		task.wait(RETRY_BASE_DELAY * 2 ^ (attempt - 1))
+	end
+	return false
+end
+
+-- | Public | --
+
+--[[
+	Makes the player's persistent data available for this session.
+]]
+function PlayerData.Load(player: Player)
+	local ok, data = withRetry(function()
+		return store:GetAsync(`player_{player.UserId}`)
+	end)
+	sessionCache[player] = if ok and data then data else DeepCopy(PlayerData.Defaults)
+end
+
+--[[
+	Persists the player's session data and releases it.
+]]
+function PlayerData.Save(player: Player)
+	local data = sessionCache[player]
+	if not data then return end
+	withRetry(function()
+		store:UpdateAsync(`player_{player.UserId}`, function()
+			return data
+		end)
+	end)
+	sessionCache[player] = nil
+end
+
+--[[
+	Persists the data of every active player (typically on shutdown).
+]]
+function PlayerData.SaveAll()
+	for player in sessionCache do
+		task.spawn(PlayerData.Save, player)
+	end
+end
+
+-- // INITIALIZATION // --
+
+PlayerData.Defaults = {
+	coins = 0,
+	level = 1,
+}
+
+return PlayerData
+```
+
+## LocalScript
+
+```lua
+--!strict
+
+-- // VARIABLES // --
+
+-- | Services | --
+local Players = game:GetService("Players")
+
+-- | Objects | --
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+local hud = playerGui:WaitForChild("HUD")
+local coinLabel = hud:WaitForChild("CoinLabel") :: TextLabel
+
+-- | Configuration | --
+local COIN_ATTRIBUTE = "Coins"
+
+-- | State Management | --
+local displayedCoins = 0
+
+-- // FUNCTIONS // --
+
+--[[
+	Synchronizes the coin display with the player's current state.
+]]
+local function updateCoinDisplay()
+	local coins = player:GetAttribute(COIN_ATTRIBUTE) or 0
+	if coins == displayedCoins then return end
+	displayedCoins = coins
+	coinLabel.Text = tostring(coins)
+end
+
+-- // INITIALIZATION // --
+
+player:GetAttributeChangedSignal(COIN_ATTRIBUTE):Connect(updateCoinDisplay)
+updateCoinDisplay()
+```
+
+## Notes on the templates
+
+- The ModuleScript's table (`local PlayerData = {}`) lives at the end of State Management; static data assigned to it (like `Defaults`) may be set in INITIALIZATION.
+- `table.pack`/`table.unpack` in `withRetry` is acceptable here because retries are rare-path; never do this in a hot loop.
+- The LocalScript reads state via Attributes rather than a RemoteEvent — prefer attribute/tag replication for simple state; reserve remotes for actions.
+- Every declared Service/Module/Object/constant in these templates is used — copy that discipline: declare only what the script actually needs.
+- Bare `WaitForChild` is fine for containers that always replicate (ReplicatedStorage, PlayerGui). For `workspace` descendants under StreamingEnabled, use a timeout or a CollectionService tag signal instead ([patterns.md](patterns.md#streaming-streamingenabled)).
+- The doc comments here model the UDD rules: one terse technical line, contract-level, English, no em dashes or emoji (SKILL.md → FUNCTIONS). Copy that brevity; never pad a file with multi-line doc blocks.
+- The `--!strict` header shown is illustrative. Per SKILL.md it is opt-in — match the project's strictness and never add it unbidden.
